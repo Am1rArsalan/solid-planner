@@ -1,0 +1,35 @@
+.Pomodoro {
+  padding: 1rem;
+}
+
+.PomodoroTimer {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 1rem 1.2rem;
+  width: 32rem;
+}
+
+.Timer {
+  font-size: 2rem;
+}
+
+.TimerActionButton {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ActivePomodoro {
+  background-color: lightgreen;
+}
+
+.PomodoroTitle {
+  width: 70%;
+  font-size: 1.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
