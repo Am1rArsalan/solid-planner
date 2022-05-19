@@ -1,0 +1,37 @@
+.Backlog {
+  padding: 1rem;
+}
+
+.TaskInput {
+  width: 32rem;
+  justify-content: space-between;
+  padding: 1rem 1.2rem;
+  font-size: 1.75rem;
+  border: none;
+  box-shadow: 0px 1px 2px #7c7c7c;
+}
+
+.Task {
+  display: flex;
+  padding: 1rem;
+  align-items: center;
+  gap: 1rem;
+  border: 2px solid #eee;
+  width: 32rem;
+  justify-content: space-between;
+}
+
+.TaskTitle {
+  width: 70%;
+  font-size: 1.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.TimerActions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
