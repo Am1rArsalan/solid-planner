@@ -5,10 +5,6 @@
   padding: 1rem;
 }
 
-.Backlog {
-  padding: 1rem;
-}
-
 /* Tasks */
 .Tasks {
   display: flex;
@@ -25,16 +21,6 @@
   gap: 1rem;
 }
 
-.Task {
-  display: flex;
-  padding: 1rem;
-  align-items: center;
-  gap: 1rem;
-  border: 2px solid #eee;
-  width: 32rem;
-  justify-content: space-between;
-}
-
 .TaskItem {
   font-size: 2rem;
   display: flex;
@@ -42,58 +28,8 @@
   justify-content: center;
 }
 
-.TaskInput {
-  width: 32rem;
-  justify-content: space-between;
-  padding: 1rem 1.2rem;
-  font-size: 1.75rem;
-  border: none;
-  box-shadow: 0px 1px 2px #7c7c7c;
-}
-
-.TaskTitle {
-  width: 70%;
-  font-size: 1.75rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 /* pomodoro */
-.Pomodoro {
-  padding: 1rem;
-}
 
-.PomodoroTimer {
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  padding: 1rem 1.2rem;
-  width: 32rem;
-}
-
-.ActivePomodoro {
-  background-color: lightgreen;
-}
-
-.Timer {
-  font-size: 2rem;
-}
-
-.TimerActions {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-}
-
-.TimerActionButton {
-  width: 2rem;
-  height: 2rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 /* 
  * calender 
  */
