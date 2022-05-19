@@ -33,3 +33,13 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.PomodoroItem {
+  display: flex;
+  padding: 1rem;
+  align-items: center;
+  gap: 1rem;
+  border: 2px solid #eee;
+  width: 32rem;
+  justify-content: space-between;
+}

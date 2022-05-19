@@ -116,13 +116,13 @@ export const PomodoroItem: Component<{
   isActive: boolean;
 }> = ({ isActive, title, children, handleActive }) => {
   const pomodoroClass = isActive
-    ? [styles.Task, styles.ActivePomodoro].join(" ")
-    : styles.Task;
+    ? [styles.PomodoroItem, styles.ActivePomodoro].join(" ")
+    : styles.PomodoroItem;
 
   return (
     <div class={pomodoroClass} onClick={() => handleActive(title)}>
       <div class={styles.PomodoroTitle}>{title}</div>
-      <div class={styles.TaskAction}>{children} </div>
+      <div class={styles.PomodoroItemAction}>{children} </div>
     </div>
   );
 };
