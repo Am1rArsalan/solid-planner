@@ -1,15 +1,12 @@
 import { Accessor, Component, onCleanup } from "solid-js";
 import { createStore } from "solid-js/store";
-import { PomodoroType } from "../types/pomodoro";
+import { timeMap } from "../constants/pomodoro";
+import {
+  PomodoroFocusType,
+  PomodoroTimerState,
+  PomodoroType,
+} from "../types/pomodoro";
 import styles from "./Pomodoro.module.css";
-
-type PomodoroFocusType = "Focus" | "Rest";
-type PomodoroTimerState = "PLAY" | "PAUSE";
-
-const timeMap = new Map<PomodoroFocusType, number>([
-  ["Focus", 25],
-  ["Rest", 15],
-]);
 
 export const Pomodoro: Component<{
   selected: Accessor<PomodoroType | null>;
