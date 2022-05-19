@@ -72,6 +72,10 @@
   width: 32rem;
 }
 
+.ActivePomodoro {
+  background-color: lightgreen;
+}
+
 .Timer {
   font-size: 2rem;
 }
