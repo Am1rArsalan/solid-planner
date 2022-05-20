@@ -1,11 +1,14 @@
 import { Component } from "solid-js";
 import { createStore } from "solid-js/store";
+import { TaskType } from "../types/backlog";
 import styles from "./Backlog.module.css";
 
-export const BackLog: Component<{
+type Props = {
   handleAdd: (value: string) => void;
   handleRemove: (value: string) => void;
-}> = ({ children, handleAdd }) => {
+};
+
+export const BackLog: Component<Props> = ({ children, handleAdd }) => {
   const [state, setState] = createStore<{
     value: string;
     isSubmitting: boolean;
@@ -22,17 +25,21 @@ export const BackLog: Component<{
     });
   };
 
+  const handleSubmit = () => {
+    handleAdd(state.value);
+    setState({
+      value: "",
+      isSubmitting: false,
+    });
+  };
+
   return (
     <div class={styles.Backlog}>
       <h2> Backlog </h2>
       <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleAdd(state.value);
-          setState({
-            value: "",
-            isSubmitting: false,
-          });
+        onSubmit={(ev) => {
+          ev.preventDefault();
+          handleSubmit();
         }}
       >
         <input
@@ -46,10 +53,7 @@ export const BackLog: Component<{
   );
 };
 
-export const BacklogItem: Component<{ title: string }> = ({
-  title,
-  children,
-}) => {
+export const BacklogItem: Component<TaskType> = ({ title, children }) => {
   return (
     <div class={styles.Task}>
       <div class={styles.TaskTitle}>{title}</div>
