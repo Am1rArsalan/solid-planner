@@ -7,19 +7,18 @@ import Calender from "./components/Calender";
 import { Pomodoro, PomodoroItem } from "./components/Pomodoro";
 import { createTask } from "./store/createBacklog";
 import { createPomodoroItem } from "./store/createPomodoro";
-import { PomodoroType } from "./types/pomodoro";
+import { TaskType } from "./types/backlog";
+import { PomodoroFocusType, PomodoroType } from "./types/pomodoro";
 
-type TaskType = {
-  title: string;
+type Props = {
+  backlog: TaskType[];
+  pomodors: PomodoroType[];
 };
 
 export default function () {
-  const [state, setState] = createStore<{
-    backlog: TaskType[];
-    pomodors: PomodoroType[];
-  }>({ backlog: [], pomodors: [] });
-
-  const [selected, setSelected] = createSignal<null | PomodoroType>(null);
+  const [state, setState] = createStore<Props>({ backlog: [], pomodors: [] });
+  const [selected, setSelected] = createSignal<PomodoroType | null>(null);
+  const [pomodoro, setPomodoro] = createSignal<PomodoroFocusType>("Focus");
 
   const handleAdd = (task: string) => {
     if (!task.length) return;
@@ -65,7 +64,13 @@ export default function () {
   };
 
   return (
-    <div class={styles.App}>
+    <div
+      class={
+        pomodoro() == "Focus"
+          ? styles.App
+          : [styles.App, styles.BlueApp].join(" ")
+      }
+    >
       <div class={styles.Tasks}>
         <BackLog handleAdd={handleAdd} handleRemove={handleRemove}>
           <For each={state.backlog}>
@@ -77,7 +82,11 @@ export default function () {
             )}
           </For>
         </BackLog>
-        <Pomodoro selected={selected}>
+        <Pomodoro
+          selected={selected}
+          pomodoro={pomodoro}
+          changePomodoroState={(value: PomodoroFocusType) => setPomodoro(value)}
+        >
           <For each={state.pomodors}>
             {(item) => (
               <PomodoroItem
