@@ -1,4 +1,4 @@
-import { Accessor, Component, onCleanup } from "solid-js";
+import { Accessor, Component, onCleanup, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import { timeMap } from "../constants/pomodoro";
 import {
@@ -8,11 +8,19 @@ import {
 } from "../types/pomodoro";
 import styles from "./Pomodoro.module.css";
 
-export const Pomodoro: Component<{
+type Props = {
   selected: Accessor<PomodoroType | null>;
-}> = ({ children, selected }) => {
+  pomodoro: Accessor<PomodoroFocusType>;
+  changePomodoroState: (value: PomodoroFocusType) => void;
+};
+
+export const Pomodoro: Component<Props> = ({
+  children,
+  selected,
+  pomodoro,
+  changePomodoroState,
+}) => {
   const [state, setState] = createStore<{
-    pomodoro: PomodoroFocusType;
     timerState: PomodoroTimerState;
     time: {
       minutes: number;
@@ -24,7 +32,6 @@ export const Pomodoro: Component<{
     };
   }>({
     timerState: "PAUSE",
-    pomodoro: "Focus",
     time: {
       minutes: timeMap.get("Focus") as number,
       seconds: 0,
@@ -35,6 +42,29 @@ export const Pomodoro: Component<{
     },
   });
 
+  const handleRun = () => {
+    if (selected()) {
+      selected()?.active &&
+        setState({
+          ...state,
+          timerState: state.timerState === "PLAY" ? "PAUSE" : "PLAY",
+          error: {
+            status: false,
+            message: "",
+          },
+        });
+      return;
+    }
+
+    setState({
+      ...state,
+      error: {
+        status: true,
+        message: "Please select a task",
+      },
+    });
+  };
+
   const interval = setInterval(() => {
     if (state.timerState == "PLAY") {
       const clone = { ...state, time: { ...state.time } };
@@ -44,10 +74,13 @@ export const Pomodoro: Component<{
         clone.time.seconds = clone.time.minutes - 1 >= 0 ? 59 : 0;
 
         if (clone.time.minutes - 1 < 0) {
-          clone.pomodoro = clone.pomodoro == "Focus" ? "Rest" : "Focus";
-          clone.time.minutes = timeMap.get(clone.pomodoro) as number;
+          changePomodoroState(pomodoro() == "Focus" ? "Rest" : "Focus");
+          clone.time.minutes = timeMap.get(pomodoro()) as number;
           clone.timerState = "PAUSE";
-          // TODO: notify user (make noise)
+          const audio = new Audio(
+            "https://media.geeksforgeeks.org/wp-content/uploads/20190531135120/beep.mp3"
+          );
+          audio.play();
         } else {
           clone.time.minutes = clone.time.minutes - 1;
         }
@@ -64,41 +97,25 @@ export const Pomodoro: Component<{
       <h2> pomodoro </h2>
       <div class={styles.PomodoroTimer}>
         <div class={styles.Timer}>
-          {state.time.minutes > 9
-            ? state.time.minutes
-            : `0${state.time.seconds}`}
+          <Show
+            when={state.time.minutes > 9}
+            fallback={`0${state.time.minutes}`}
+          >
+            {state.time.minutes}
+          </Show>
           :
-          {state.time.seconds > 9
-            ? state.time.seconds
-            : `0${state.time.seconds}`}
+          <Show
+            when={state.time.seconds > 9}
+            fallback={`0${state.time.seconds}`}
+          >
+            {state.time.seconds}
+          </Show>
         </div>
         <div class={styles.TimerActions}>
-          <button
-            class={styles.TimerActionButton}
-            onClick={() => {
-              if (selected()) {
-                selected()?.active &&
-                  setState({
-                    ...state,
-                    timerState: state.timerState === "PLAY" ? "PAUSE" : "PLAY",
-                    error: {
-                      status: false,
-                      message: "",
-                    },
-                  });
-                return;
-              }
-
-              setState({
-                ...state,
-                error: {
-                  status: true,
-                  message: "Please select a task",
-                },
-              });
-            }}
-          >
-            {state.timerState === "PAUSE" ? "▶" : "⏹"}
+          <button class={styles.TimerActionButton} onClick={handleRun}>
+            <Show when={state.timerState === "PAUSE"} fallback={"⏹"}>
+              ▶
+            </Show>
           </button>
         </div>
       </div>
@@ -107,11 +124,18 @@ export const Pomodoro: Component<{
   );
 };
 
-export const PomodoroItem: Component<{
+type PomodoroItemProps = {
   title: string;
   handleActive: (title: string) => void;
   isActive: boolean;
-}> = ({ isActive, title, children, handleActive }) => {
+};
+
+export const PomodoroItem: Component<PomodoroItemProps> = ({
+  isActive,
+  title,
+  children,
+  handleActive,
+}) => {
   const pomodoroClass = isActive
     ? [styles.PomodoroItem, styles.ActivePomodoro].join(" ")
     : styles.PomodoroItem;
