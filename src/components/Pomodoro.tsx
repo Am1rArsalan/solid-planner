@@ -1,4 +1,4 @@
-import { Accessor, Component, onCleanup, Show } from "solid-js";
+import { Accessor, Component, onCleanup, Show, ParentProps } from "solid-js";
 import { createStore } from "solid-js/store";
 import { timeMap } from "../constants/pomodoro";
 import {
@@ -8,11 +8,11 @@ import {
 } from "../types/pomodoro";
 import styles from "./Pomodoro.module.css";
 
-type Props = {
+type Props = ParentProps<{
   selected: Accessor<PomodoroType | null>;
   pomodoro: Accessor<PomodoroFocusType>;
   changePomodoroState: (value: PomodoroFocusType) => void;
-};
+}>;
 
 export const Pomodoro: Component<Props> = ({
   children,
@@ -124,11 +124,11 @@ export const Pomodoro: Component<Props> = ({
   );
 };
 
-type PomodoroItemProps = {
+type PomodoroItemProps = ParentProps<{
   title: string;
   handleActive: (title: string) => void;
   isActive: boolean;
-};
+}>;
 
 export const PomodoroItem: Component<PomodoroItemProps> = ({
   isActive,
