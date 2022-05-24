@@ -5,18 +5,16 @@ import styles from "./App.module.css";
 import { BackLog, BacklogItem } from "./components/Backlog";
 import Calender from "./components/Calender";
 import { Pomodoro, PomodoroItem } from "./components/Pomodoro";
-import { createTask } from "./store/createBacklog";
+import { createTask } from "./store/createBacklogs";
 import { createPomodoroItem } from "./store/createPomodoro";
 import { TaskType } from "./types/backlog";
 import { PomodoroFocusType, PomodoroType } from "./types/pomodoro";
 
-type Props = {
-  backlog: TaskType[];
-  pomodors: PomodoroType[];
-};
-
 export default function () {
-  const [state, setState] = createStore<Props>({ backlog: [], pomodors: [] });
+  const [state, setState] = createStore<{
+    backlog: TaskType[];
+    pomodors: PomodoroType[];
+  }>({ backlog: [], pomodors: [] });
   const [selected, setSelected] = createSignal<PomodoroType | null>(null);
   const [pomodoro, setPomodoro] = createSignal<PomodoroFocusType>("Focus");
 
