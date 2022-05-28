@@ -1,33 +1,29 @@
-import { createResource } from "solid-js";
+// FIXME => never & any
+import { createResource, createSignal } from "solid-js";
+import type { Resource } from "solid-js";
+import { SetStoreFunction } from "solid-js/store";
+import type { AgentType } from "./createAgent";
+import { StoreType } from ".";
 
-export default function createBacklogs(agent, actions, state, setState) {
-  const [backlogs, { mutate, refetch }] = createResource(
-    () => state.articleSlug,
-    agent.Backlogs.forArticle,
-    { initialValue: [] }
-  );
+// TODO: remove never
+export default function createBacklogs(
+  agent: AgentType,
+  actions: any,
+  state: StoreType,
+  setState: SetStoreFunction<StoreType>
+): Resource<never[]> {
+  const [backlogs] = createResource(async () => await agent.Backlogs.getAll());
+
   Object.assign(actions, {
-    loadBacklogs(articleSlug, reload) {
-      if (reload) return refetch();
-      setState({ articleSlug });
-    },
-    async createBacklog(backlog) {
-      const { errors } = await agent.Backlogs.create(
-        state.articleSlug,
-        backlog
-      );
-      if (errors) throw errors;
-    },
-    async deleteBacklog(id) {
-      mutate(backlogs().filter((c) => c.id !== id));
-      try {
-        await agent.Backlogs.delete(state.articleSlug, id);
-      } catch (err) {
-        actions.loadBacklogs(state.articleSlug);
-        throw err;
-      }
+    loadBacklogs(data: any) {
+      console.log("data is", data, backlogs);
+      //setState({ backlogs : });
+      console.log("in load backlogs", data);
+      //setArticleSource(["articles", predicate]);
     },
   });
+
+  console.log("backlogs to return is", backlogs.loading);
   return backlogs;
 }
 
@@ -36,3 +32,20 @@ export function createTask(title: string) {
     title,
   };
 }
+
+//async createBacklog(backlog: string) {
+//const { errors } = await agent.Backlogs.create(
+//state.articleSlug,
+//backlog
+//);
+//if (errors) throw errors;
+//},
+//async deleteBacklog(id: string) {
+//mutate(backlogs().filter((c) => c?.id !== id));
+//try {
+//await agent.Backlogs.delete(state.articleSlug, id);
+//} catch (err) {
+//actions.loadBacklogs(state.articleSlug);
+//throw err;
+//}
+//},
