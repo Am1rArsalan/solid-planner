@@ -2,6 +2,8 @@
 
 features : 
    - [x] backlog 
-   - [] pomodoro task management 
+   - [x] pomodoro task management 
    - [] calender 
-   - [] improve ui
+   - [] improve ui 
+
+
