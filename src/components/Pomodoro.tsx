@@ -126,7 +126,7 @@ export const Pomodoro: Component<Props> = ({
 
 type PomodoroItemProps = ParentProps<{
   title: string;
-  handleActive: (title: string) => void;
+  handleActive: () => void;
   isActive: boolean;
 }>;
 
@@ -141,7 +141,7 @@ export const PomodoroItem: Component<PomodoroItemProps> = ({
     : styles.PomodoroItem;
 
   return (
-    <div class={pomodoroClass} onClick={() => handleActive(title)}>
+    <div class={pomodoroClass} onClick={handleActive}>
       <div class={styles.PomodoroTitle}>{title}</div>
       <div class={styles.PomodoroItemAction}>{children} </div>
     </div>
