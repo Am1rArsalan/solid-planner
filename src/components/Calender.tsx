@@ -31,14 +31,6 @@ const year = 2022;
 const Calender: Component = (props) => {
   const currentDate = new Date();
 
-  console.log(
-    "amir is here",
-    Array.from(
-      { length: +daysInMonth(+months[currentDate.getMonth()], year) },
-      (i: number) => i
-    )
-  );
-
   return (
     <div style={styles.Calender}>
       <div style={styles.CalenderActions}>
