@@ -5,7 +5,6 @@ import styles from "./Backlog.module.css";
 
 type Props = ParentProps<{
   handleAdd: (value: string) => void;
-  handleRemove: (value: string) => void;
 }>;
 
 export const BackLog: Component<Props> = ({ children, handleAdd }) => {
