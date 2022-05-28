@@ -1,4 +1,4 @@
-import { createSignal, For } from "solid-js";
+import { createResource, createSignal, For } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import styles from "./App.module.css";
@@ -6,44 +6,148 @@ import { BackLog, BacklogItem } from "./components/Backlog";
 import Calender from "./components/Calender";
 import { Pomodoro, PomodoroItem } from "./components/Pomodoro";
 import { createTask } from "./store/createBacklogs";
-import { createPomodoroItem } from "./store/createPomodoro";
 import { TaskType } from "./types/backlog";
 import { PomodoroFocusType, PomodoroType } from "./types/pomodoro";
 
+const API_ROOT = "http://localhost:8000";
+
 export default function () {
-  const [state, setState] = createStore<{
-    backlog: TaskType[];
-    pomodors: PomodoroType[];
-  }>({ backlog: [], pomodors: [] });
+  const [backlogs, { mutate, refetch }] = createResource<TaskType[]>(
+    async () => {
+      const res = await (
+        await fetch(`${API_ROOT}/backlogs`, {
+          method: "GET",
+        })
+      ).json();
+      return res.data;
+    }
+  );
+
+  const [pomodoros, { mutate: pomodorsMutate, refetch: refetchPomodoros }] =
+    createResource<PomodoroType[]>(async () => {
+      const res = await (
+        await fetch(`${API_ROOT}/pomodoros`, { method: "GET" })
+      ).json();
+      return res.data;
+    });
+
   const [selected, setSelected] = createSignal<PomodoroType | null>(null);
   const [pomodoro, setPomodoro] = createSignal<PomodoroFocusType>("Focus");
 
-  const handleAdd = (task: string) => {
+  const handleAdd = async (task: string) => {
     if (!task.length) return;
-    setState({
-      ...state,
-      backlog: [...state.backlog, createTask(task)],
+
+    const res = await fetch(`${API_ROOT}/backlogs`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(createTask(task)),
+    });
+
+    if (res.status != 201) {
+      throw Error("Error in creating a backlog task");
+    }
+    const addedTask = (await res.json()).data;
+
+    mutate((prev) => {
+      return [addedTask, ...prev];
     });
   };
 
-  const handleRemove = (task: string) => {
-    setState({
-      ...state,
-      backlog: state.backlog.filter((item) => item.title != task),
+  const handleRemovePomodoro = async (id: string) => {
+    if (id.length === 0) return;
+
+    // FIXME: redo this types
+    let removedItemIndex = pomodoros()?.findIndex(
+      (item) => item._id == id
+    ) as number;
+    let removedItem = (pomodoros() as PomodoroType[])[
+      removedItemIndex
+    ] as PomodoroType;
+
+    pomodorsMutate((prev) => {
+      return prev?.filter((item) => item._id !== id);
     });
+
+    const res = await fetch(`${API_ROOT}/pomodoros/${id}`, {
+      method: "DELETE",
+    });
+
+    // TODO : if there was an error add the item in removedItemIndex
+    if (res.status != 200) {
+      pomodorsMutate((prev) => {
+        return [...prev, removedItem];
+      });
+      throw Error("Error in removing a backlog task");
+    }
   };
 
-  const handleMove = (title: string) => {
-    setState({
-      ...state,
-      backlog: state.backlog.filter((item) => item.title != title),
-      pomodors: [...state.pomodors, createPomodoroItem(title)],
+  const handleRemoveBacklogTask = async (id: string) => {
+    if (id.length === 0) return;
+
+    // FIXME: redo this types
+    let removedItemIndex = backlogs()?.findIndex(
+      (item) => item._id == id
+    ) as number;
+    let removedItem = (backlogs() as TaskType[])[removedItemIndex] as TaskType;
+
+    mutate((prev) => {
+      return prev?.filter((item) => item._id !== id);
     });
+
+    const res = await fetch(`${API_ROOT}/backlogs/${id}`, {
+      method: "DELETE",
+    });
+
+    // TODO : if there was an error add the item in removedItemIndex
+    if (res.status != 200) {
+      mutate((prev) => {
+        return [...prev, removedItem];
+      });
+      throw Error("Error in removing a backlog task");
+    }
   };
 
-  const handleActive = (title: string) => {
-    const newPomodoros = state.pomodors.map((item) => {
-      if (item.title === title) {
+  const handleMoveToBacklogs = async (id: string) => {
+    // TODO : optimistic ui
+    if (id.length === 0) return;
+
+    const res = await fetch(`${API_ROOT}/pomodoros/${id}`, {
+      method: "PUT",
+    });
+
+    if (res.status != 200) {
+      throw Error("Error in removing a backlog task");
+    }
+
+    pomodorsMutate((prev) => {
+      return prev?.filter((item) => item._id !== id);
+    });
+    refetch();
+  };
+
+  const handleMoveToPomodoros = async (id: string) => {
+    // TODO : optimistic ui
+    if (id.length === 0) return;
+
+    const res = await fetch(`${API_ROOT}/backlogs/${id}`, {
+      method: "PUT",
+    });
+
+    if (res.status != 200) {
+      throw Error("Error in removing a backlog task");
+    }
+
+    mutate((prev) => {
+      return prev?.filter((item) => item._id !== id);
+    });
+    refetchPomodoros();
+  };
+
+  const handleActive = async (id: string) => {
+    let newPomodoros = pomodoros()?.map((item) => {
+      if (item._id === id) {
         return {
           ...item,
           active: true,
@@ -51,14 +155,37 @@ export default function () {
       }
       return { ...item, active: false };
     });
-    const selectedPomodoroIndex = newPomodoros.findIndex((item) => item.active);
+
+    pomodorsMutate(() => {
+      return newPomodoros;
+    });
+
+    const res = await fetch(`${API_ROOT}/pomodoros/${id}/active`, {
+      method: "PUT",
+    });
+
+    console.log("res", res);
+
+    if (!res.ok) {
+      pomodorsMutate((prev) => {
+        return prev?.map((item) => {
+          if (item.active) {
+            return {
+              ...item,
+              active: false,
+            };
+          }
+          return item;
+        });
+      });
+    }
+
+    const selectedPomodoroIndex = newPomodoros?.findIndex(
+      (item) => item.active
+    );
     const activePomodoroTask =
       selectedPomodoroIndex !== -1 ? newPomodoros[selectedPomodoroIndex] : null;
     setSelected(activePomodoroTask);
-    setState({
-      ...state,
-      pomodors: newPomodoros,
-    });
   };
 
   return (
@@ -70,12 +197,17 @@ export default function () {
       }
     >
       <div class={styles.Tasks}>
-        <BackLog handleAdd={handleAdd} handleRemove={handleRemove}>
-          <For each={state.backlog}>
+        <BackLog handleAdd={handleAdd}>
+          <div> {backlogs.loading && "loading..."}</div>
+          <For each={backlogs()}>
             {(task) => (
-              <BacklogItem title={task.title}>
-                <button onClick={() => handleMove(task.title)}>{"➡"}</button>
-                <button onClick={() => handleRemove(task.title)}>{"X"}</button>
+              <BacklogItem {...task}>
+                <button onClick={() => handleMoveToPomodoros(task._id)}>
+                  {"➡"}
+                </button>
+                <button onClick={() => handleRemoveBacklogTask(task._id)}>
+                  {"X"}
+                </button>
               </BacklogItem>
             )}
           </For>
@@ -85,16 +217,28 @@ export default function () {
           pomodoro={pomodoro}
           changePomodoroState={(value: PomodoroFocusType) => setPomodoro(value)}
         >
-          <For each={state.pomodors}>
+          <div> {pomodoros.loading && "loading..."}</div>
+          <For each={pomodoros()}>
             {(item) => (
               <PomodoroItem
                 isActive={item.active}
                 title={item.title}
-                handleActive={handleActive}
+                handleActive={() => handleActive(item._id)}
               >
-                <button>{"↩"}</button>
-                <button>{"⬇"}</button>
-                <button>{"✔"}</button>
+                <button onClick={() => handleMoveToBacklogs(item._id)}>
+                  {"⬅ "}
+                </button>
+                <button
+                  onClick={() => console.log("modify pomodoros properties")}
+                >
+                  {"⬇"}
+                </button>
+                <button onClick={() => console.log("make task done")}>
+                  {"✔"}
+                </button>
+                <button onClick={() => handleRemovePomodoro(item._id)}>
+                  {"X"}
+                </button>
               </PomodoroItem>
             )}
           </For>
