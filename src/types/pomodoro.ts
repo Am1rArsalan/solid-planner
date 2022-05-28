@@ -1,6 +1,10 @@
 export type PomodoroType = {
+  _id: string;
   title: string;
-  active: boolean;
+  current: number;
+  end: number;
+  done: boolean;
+  active: boolen;
 };
 
 export type PomodoroFocusType = "Focus" | "Rest";
