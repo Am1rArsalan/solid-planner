@@ -21,6 +21,7 @@
   border: 2px solid #eee;
   width: 32rem;
   justify-content: space-between;
+  cursor: pointer;
 }
 
 .TaskTitle {
