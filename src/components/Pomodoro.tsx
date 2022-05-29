@@ -9,7 +9,7 @@ import {
 import styles from "./Pomodoro.module.css";
 
 type Props = ParentProps<{
-  selected: Accessor<PomodoroType | null>;
+  selected: Accessor<PomodoroType | undefined>;
   pomodoro: Accessor<PomodoroFocusType>;
   changePomodoroState: (value: PomodoroFocusType) => void;
 }>;
@@ -44,15 +44,14 @@ export const Pomodoro: Component<Props> = ({
 
   const handleRun = () => {
     if (selected()) {
-      selected()?.active &&
-        setState({
-          ...state,
-          timerState: state.timerState === "PLAY" ? "PAUSE" : "PLAY",
-          error: {
-            status: false,
-            message: "",
-          },
-        });
+      setState({
+        ...state,
+        timerState: state.timerState === "PLAY" ? "PAUSE" : "PLAY",
+        error: {
+          status: false,
+          message: "",
+        },
+      });
       return;
     }
 
@@ -65,6 +64,7 @@ export const Pomodoro: Component<Props> = ({
     });
   };
 
+  // TODO : see if can be optimize
   const interval = setInterval(() => {
     if (state.timerState == "PLAY") {
       const clone = { ...state, time: { ...state.time } };
@@ -77,18 +77,18 @@ export const Pomodoro: Component<Props> = ({
           changePomodoroState(pomodoro() == "Focus" ? "Rest" : "Focus");
           clone.time.minutes = timeMap.get(pomodoro()) as number;
           clone.timerState = "PAUSE";
-          const audio = new Audio(
-            "https://media.geeksforgeeks.org/wp-content/uploads/20190531135120/beep.mp3"
-          );
-          audio.play();
+          // TODO : correct this later
+          //const audio = new Audio(
+          //"https://media.geeksforgeeks.org/wp-content/uploads/20190531135120/beep.mp3"
+          //);
+          //audio.play();
         } else {
           clone.time.minutes = clone.time.minutes - 1;
         }
       }
-
       setState({ ...clone });
     }
-  }, 1000);
+  }, 10);
 
   onCleanup(() => clearInterval(interval));
 
@@ -124,24 +124,29 @@ export const Pomodoro: Component<Props> = ({
   );
 };
 
-type PomodoroItemProps = ParentProps<{
-  title: string;
-  handleActive: () => void;
-  isActive: boolean;
-}>;
+type PomodoroItemProps = ParentProps<
+  PomodoroType & {
+    handleActive: () => void;
+    activePomodoro: Accessor<PomodoroType | undefined>;
+  }
+>;
 
 export const PomodoroItem: Component<PomodoroItemProps> = ({
-  isActive,
+  _id,
   title,
   children,
   handleActive,
+  activePomodoro,
 }) => {
-  const pomodoroClass = isActive
-    ? [styles.PomodoroItem, styles.ActivePomodoro].join(" ")
-    : styles.PomodoroItem;
-
   return (
-    <div class={pomodoroClass} onClick={handleActive}>
+    <div
+      class={
+        activePomodoro()?._id == _id
+          ? [styles.PomodoroItem, styles.ActivePomodoro].join(" ")
+          : styles.PomodoroItem
+      }
+      onClick={handleActive}
+    >
       <div class={styles.PomodoroTitle}>{title}</div>
       <div class={styles.PomodoroItemAction}>{children} </div>
     </div>
