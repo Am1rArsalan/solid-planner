@@ -188,6 +188,8 @@ export default function () {
           selected={activePomodoro}
           pomodoro={pomodoro}
           changePomodoroState={async (value: PomodoroFocusType) => {
+            // BUG : on first pomodoro focus pomodoro
+            // it will increase the current counter 2 time
             if (value === "Focus") {
               setPomodoro(value);
               return;
