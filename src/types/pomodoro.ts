@@ -4,6 +4,7 @@ export type PomodoroType = {
   current: number;
   end: number;
   done: boolean;
+  status: "Backlog" | "Pomodoro";
 };
 
 export type PomodoroFocusType = "Focus" | "Rest";

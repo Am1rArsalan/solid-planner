@@ -1,13 +1,12 @@
 import { Component, ParentProps } from "solid-js";
 import { createStore } from "solid-js/store";
-import { TaskType } from "../types/backlog";
 import styles from "./Backlog.module.css";
 
 type Props = ParentProps<{
   handleAdd: (value: string) => void;
 }>;
 
-export const BackLog: Component<Props> = ({ children, handleAdd }) => {
+export const Backlog: Component<Props> = ({ children, handleAdd }) => {
   const [state, setState] = createStore<{
     value: string;
     isSubmitting: boolean;
@@ -52,7 +51,7 @@ export const BackLog: Component<Props> = ({ children, handleAdd }) => {
   );
 };
 
-export const BacklogItem: Component<ParentProps<TaskType>> = ({
+export const BacklogItem: Component<ParentProps<{ title: string }>> = ({
   title,
   children,
 }) => {

@@ -27,12 +27,6 @@ export default function createBacklogs(
   return backlogs;
 }
 
-export function createTask(title: string) {
-  return {
-    title,
-  };
-}
-
 //async createBacklog(backlog: string) {
 //const { errors } = await agent.Backlogs.create(
 //state.articleSlug,
