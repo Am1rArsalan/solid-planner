@@ -7,11 +7,11 @@ import {
   ParentProps,
   Show,
 } from "solid-js";
-import { createStore } from "solid-js/store";
 import styles from "./App.module.css";
 import { Backlog, BacklogItem } from "./components/Backlog";
 import Calender from "./components/Calender";
 import { Pomodoro, PomodoroItem } from "./components/Pomodoro";
+import PomodoroItemConfigForm from "./components/PomodoroItemConfigForm";
 import { PomodoroFocusType, PomodoroType } from "./types/pomodoro";
 
 const API_ROOT = "http://localhost:8000";
@@ -19,9 +19,9 @@ const API_ROOT = "http://localhost:8000";
 export default function () {
   const [showDetail, setShowDetail] = createSignal("");
   const selectedPomodoro = localStorage.getItem("activePomodoro");
-  const [activePomodoro, setActivePomodoro] = createSignal<
-    PomodoroType | undefined
-  >(selectedPomodoro !== null ? JSON.parse(selectedPomodoro) : undefined);
+  const [activePomodoro, setActivePomodoro] = createSignal<PomodoroType | null>(
+    selectedPomodoro !== null ? JSON.parse(selectedPomodoro) : null
+  );
   const [pomodoro, setPomodoro] = createSignal<PomodoroFocusType>("Focus");
 
   // pomodoros resource
@@ -121,6 +121,11 @@ export default function () {
         return [...prev, removedItem];
       });
       throw Error("Error in removing a backlog task");
+    }
+
+    if (activePomodoro()?._id == id) {
+      localStorage.setItem("activePomodoro", JSON.stringify(null));
+      setActivePomodoro(null);
     }
   };
 
@@ -298,6 +303,7 @@ export default function () {
                     {"✔"}
                   </button>
                   <button
+                    disabled={activePomodoro()?._id == item._id}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleRemovePomodoro(item._id);
@@ -339,117 +345,6 @@ export default function () {
     </div>
   );
 }
-
-type PomodoroItemConfigFormProps = ParentProps<{
-  current: number;
-  end: number;
-  id: string;
-  revalidate: () => void;
-}>;
-
-const PomodoroItemConfigForm: Component<PomodoroItemConfigFormProps> = ({
-  current,
-  end,
-  children,
-  id,
-  revalidate,
-}) => {
-  const [state, setState] = createStore<{
-    act: number;
-    est: number;
-    active: "act" | "est";
-  }>({ active: "est", act: current, est: end });
-
-  return (
-    <>
-      <form
-        id="pomodoro-config"
-        style={{
-          display: "flex",
-          "justify-content": "space-between",
-          width: "100%",
-        }}
-        onSubmit={async (e) => {
-          // TODO : add optimistic ui
-          e.preventDefault();
-          const res = await fetch(`${API_ROOT}/pomodoros/edit`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ id, act: state.act, est: state.est }),
-          });
-
-          if (res.status != 200) {
-            /// FIXME : set error///
-            throw Error("Error in creating a backlog task");
-          }
-          revalidate();
-        }}
-      >
-        <div>
-          <span
-            style={{
-              padding: ".5rem 1rem",
-              "font-size": "2rem",
-              "border-radius": "50%",
-              border: state.active === "act" ? "1px solid green" : "unset",
-              cursor: "pointer",
-            }}
-            onClick={() =>
-              setState({
-                active: "act",
-              })
-            }
-          >
-            {state.act}
-          </span>
-          <span style={{ "font-size": "2rem", margin: "0 .5rem" }}>/</span>
-          <span
-            onClick={() =>
-              setState({
-                active: "est",
-              })
-            }
-            style={{
-              padding: ".5rem 1rem",
-              "font-size": "2rem",
-              "border-radius": "50%",
-              border: state.active === "est" ? "1px solid green" : "unset",
-              cursor: "pointer",
-            }}
-          >
-            {state.est}
-          </span>
-        </div>
-        <div style={{ display: "flex" }}>
-          <button
-            type="button"
-            onClick={() =>
-              setState({
-                [state.active]: state[state.active] + 1,
-              })
-            }
-          >
-            {"⬆"}
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              setState({
-                [state.active]:
-                  state[state.active] > 0 ? state[state.active] - 1 : 0,
-              })
-            }
-          >
-            {"⬇"}
-          </button>
-        </div>
-      </form>
-      {children}
-    </>
-  );
-};
 
 type SlideInProps = ParentProps<{ showDetail: Accessor<string>; id: string }>;
 

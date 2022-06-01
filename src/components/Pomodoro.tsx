@@ -9,7 +9,7 @@ import {
 import styles from "./Pomodoro.module.css";
 
 type Props = ParentProps<{
-  selected: Accessor<PomodoroType | undefined>;
+  selected: Accessor<PomodoroType | null>;
   pomodoro: Accessor<PomodoroFocusType>;
   changePomodoroState: (value: PomodoroFocusType) => void;
 }>;
@@ -127,7 +127,7 @@ export const Pomodoro: Component<Props> = ({
 type PomodoroItemProps = ParentProps<
   PomodoroType & {
     handleActive: () => void;
-    activePomodoro: Accessor<PomodoroType | undefined>;
+    activePomodoro: Accessor<PomodoroType | null>;
   }
 >;
 
