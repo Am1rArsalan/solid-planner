@@ -46,3 +46,7 @@
   justify-content: space-between;
   cursor: pointer;
 }
+
+.Done {
+  background-color: red;
+}

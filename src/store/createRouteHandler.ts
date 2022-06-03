@@ -1,5 +1,6 @@
 import { createSignal, onCleanup, useTransition } from "solid-js";
 
+///////////////////FIX types
 export default function createRouteHandler(init) {
   const [location, setLocation] = createSignal(
       window.location.hash.slice(2) || init

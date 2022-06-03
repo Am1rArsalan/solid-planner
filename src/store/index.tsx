@@ -1,34 +1,29 @@
-// FIX : refactor never and any
+// FIXME : refactor never and any
 import { Component, createContext, useContext } from "solid-js";
 import { ParentProps, Resource } from "solid-js";
 import { createStore } from "solid-js/store";
-import createAgent from "./createAgent";
+import { PomodoroType } from "../types/pomodoro";
+import { StoreType } from "../types/store";
 import createBacklogs from "./createBacklogs";
 //import createRouteHandler from "./createRouteHandler";
-
-export type StoreType = {
-  readonly token: string | null;
-  readonly backlogs: readonly never[];
-};
 
 const StoreContext = createContext<[StoreType, any]>();
 const RouterContext = createContext();
 type Props = ParentProps<{}>;
 
 export const Provider: Component<Props> = (props) => {
-  let backlogs: Resource<never[]>;
-  const [state, setState] = createStore<StoreType>({
-    get backlogs() {
-      return backlogs();
-    },
+  let backlogs: Resource<PomodoroType[]>;
+  const [state, setState] = createStore({
     token: localStorage.getItem("jwt"),
+    get backlogs() {
+      return backlogs;
+    },
   });
 
   const actions: any = {};
   const store: [StoreType, any] = [state, actions];
-  const agent = createAgent(store);
 
-  backlogs = createBacklogs(agent, actions, state, setState);
+  backlogs = createBacklogs(actions, state, setState);
 
   return (
     <StoreContext.Provider value={store}>
@@ -38,7 +33,8 @@ export const Provider: Component<Props> = (props) => {
 };
 
 export function useStore() {
-  const store = useContext<[StoreType, any] | undefined>(StoreContext);
+  // FIX typescript error
+  const store = useContext<[StoreType, any]>(StoreContext);
   return store;
 }
 
