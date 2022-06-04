@@ -1,22 +1,47 @@
-// FIXME : refactor never and any
-import { Component, createContext, useContext } from "solid-js";
+import { Accessor, Component, createContext, useContext } from "solid-js";
 import { ParentProps, Resource } from "solid-js";
 import { createStore } from "solid-js/store";
-import { PomodoroType } from "../types/pomodoro";
+import {
+  BacklogType,
+  PomodoroFocusType,
+  PomodoroType,
+} from "../types/pomodoro";
 import { StoreType } from "../types/store";
 import createBacklogs from "./createBacklogs";
-//import createRouteHandler from "./createRouteHandler";
+import createPomodoro from "./createPomodoro";
+import createPomodoros from "./createPomodoros";
 
 const StoreContext = createContext<[StoreType, any]>();
 const RouterContext = createContext();
+
 type Props = ParentProps<{}>;
 
+export interface Actions {
+  //
+}
+
 export const Provider: Component<Props> = (props) => {
-  let backlogs: Resource<PomodoroType[]>;
-  const [state, setState] = createStore({
+  let backlogs: Resource<BacklogType[]>;
+  let pomodoros: Resource<PomodoroType[]>;
+  let pomodoroState: Accessor<PomodoroFocusType>;
+  let activePomodoro: Accessor<PomodoroType | null>;
+
+  const [state, setState] = createStore<StoreType>({
     token: localStorage.getItem("jwt"),
     get backlogs() {
       return backlogs;
+    },
+
+    get pomodoros() {
+      return pomodoros;
+    },
+
+    get pomodoroState() {
+      return pomodoroState;
+    },
+
+    get activePomodoro() {
+      return activePomodoro;
     },
   });
 
@@ -24,6 +49,10 @@ export const Provider: Component<Props> = (props) => {
   const store: [StoreType, any] = [state, actions];
 
   backlogs = createBacklogs(actions, state, setState);
+  pomodoros = createPomodoros(actions, state, setState);
+  const singlePomodoro = createPomodoro(actions, state, setState);
+  pomodoroState = singlePomodoro.pomodoroState;
+  activePomodoro = singlePomodoro.activePomodoro;
 
   return (
     <StoreContext.Provider value={store}>
