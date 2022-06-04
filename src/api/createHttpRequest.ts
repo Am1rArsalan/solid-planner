@@ -1,8 +1,6 @@
 import { API_ROOT } from "../constants/api";
 import { HttpRequestMethodType } from "../types/api";
 
-// FIXME: any ( remove any ASAP )
-
 export async function createFetchHttpRequest(
   method: HttpRequestMethodType,
   url: string,
@@ -24,7 +22,7 @@ export async function createFetchHttpRequest(
     // ....
     //actions.logout();
     //}
-    return err as Error;
+    throw err;
   }
 }
 
@@ -55,6 +53,6 @@ export async function createHttpRequest<DataType>(
     // ....
     //actions.logout();
     //}
-    return err;
+    throw err;
   }
 }
