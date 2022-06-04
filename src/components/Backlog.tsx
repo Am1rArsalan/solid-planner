@@ -60,7 +60,7 @@ export const SortableBacklogItem: Component<
   ParentProps<{ backlog: PomodoroType; draggableId: string }>
 > = (props) => {
   const { children, backlog } = props;
-  const sortable = createSortable(backlog._id);
+  const sortable = createSortable(`${backlog._id}-${backlog.order}`);
 
   return (
     <div

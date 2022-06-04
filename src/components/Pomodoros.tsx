@@ -1,7 +1,6 @@
 import {
   Accessor,
   Component,
-  createResource,
   createSignal,
   For,
   ParentProps,
@@ -13,7 +12,7 @@ import {
   SortablePomodoroItem,
 } from "./Pomodoro";
 import PomodoroItemConfigForm from "./PomodoroItemConfigForm";
-import { PomodoroFocusType, PomodoroType } from "../types/pomodoro";
+import { PomodoroType } from "../types/pomodoro";
 import {
   DragDropProvider,
   DragDropSensors,
@@ -21,200 +20,112 @@ import {
   SortableProvider,
   closestCenter,
 } from "@thisbeyond/solid-dnd";
-import { API_ROOT } from "../constants/api";
+import { useStore } from "../store";
 
-type Props = {
-  moveBacklog: (id: string, currentStatus: "Backlog" | "Pomodoro") => void;
-};
-
-const Pomodoros: Component<Props> = () => {
-  const [pomodoro, setPomodoro] = createSignal<PomodoroFocusType>("Focus");
+const Pomodoros: Component<{
+  move: (id: string, currentStatus: "Backlog" | "Pomodoro") => void;
+}> = ({ move }) => {
   const [showDetail, setShowDetail] = createSignal("");
-  const [activePomodoroDragItem, setActivePomodoroDragItem] =
-    createSignal(null);
+  const [activeDrag, setActiveDrag] = createSignal(null);
 
-  const selectedPomodoro = localStorage.getItem("activePomodoro");
-  const [activePomodoro, setActivePomodoro] = createSignal<PomodoroType | null>(
-    selectedPomodoro !== null ? JSON.parse(selectedPomodoro) : null
-  );
-
-  // pomodoros resource
-  // TODO : make own resource
-  const [pomodoros, { mutate, refetch }] = createResource<PomodoroType[]>(
-    async () => {
-      const res = await (
-        await fetch(`${API_ROOT}/pomodoros`, { method: "GET" })
-      ).json();
-      return res.data;
-    },
+  const [
+    { pomodoros, activePomodoro },
     {
-      initialValue: [],
-    }
-  );
+      remove,
+      clientRemoveRevalidate,
+      clientRemove,
+      mutatePomodoros,
+      changeOrder,
+      clientFilterDoneTask,
+      clientFilterDoneTaskRevalidate,
+      changeActivePomodoro,
+    },
+  ] = useStore();
 
   const pomodoroIds = () => pomodoros().map((item) => item._id);
 
-  // TODO : make own resource
-  // remove backlog task ( pomodoros resource)
   const handleRemovePomodoro = async (id: string) => {
     if (id.length === 0) return;
-    // FIXME: redo this types
-
     let removedItemIndex = pomodoros().findIndex(
       (item) => item._id == id
     ) as number;
     let removedItem = pomodoros()[removedItemIndex] as PomodoroType;
 
-    mutate((prev) => {
-      return prev?.filter((item) => item._id !== id);
-    });
-    const res = await fetch(`${API_ROOT}/pomodoros/${id}`, {
-      method: "DELETE",
-    });
-    // TODO : if there was an error add the item in removedItemIndex
-    if (res.status != 200) {
-      mutate((prev) => {
-        return [...prev, removedItem];
-      });
-      throw Error("Error in removing a backlog task");
+    clientRemove(id);
+
+    try {
+      await remove(id);
+    } catch (error) {
+      clientRemoveRevalidate(removedItem);
     }
 
     if (activePomodoro()?._id == id) {
-      localStorage.setItem("activePomodoro", JSON.stringify(null));
-      setActivePomodoro(null);
+      changeActivePomodoro(null);
     }
   };
 
   const onDragEnd = async ({ draggable, droppable }) => {
-    console.log("drag end");
     if (draggable && droppable) {
       const currentItems = pomodoros();
       const fromIndex = currentItems.findIndex(
-        (item) => item._id === draggable.id
+        (item) => `${item._id}-${item.order}` === draggable.id
       );
       const toIndex = currentItems.findIndex(
-        (item) => item._id === droppable.id
+        (item) => `${item._id}-${item.order}` === droppable?.id
       );
+
+      if (
+        currentItems[fromIndex]._id.includes("Pending") ||
+        currentItems[toIndex]._id.includes("Pending")
+      ) {
+        return;
+      }
 
       if (fromIndex !== toIndex) {
         let updatedItems = currentItems.slice();
         updatedItems.splice(toIndex, 0, ...updatedItems.splice(fromIndex, 1));
 
-        mutate(updatedItems);
+        mutatePomodoros(updatedItems);
 
-        const res = await fetch(`${API_ROOT}/pomodoros/order`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
+        try {
+          await changeOrder({
             orders: updatedItems.map((item, order) => ({
               ...item,
               order: order + 1,
             })),
             status: "Pomodoro",
-          }),
-        });
-
-        if (res.status !== 200) {
-          // </div> </div>
+          });
+        } catch {
+          // handle error
         }
       }
     }
-    setActivePomodoroDragItem(null);
-  };
-
-  const handleChangePomodoroState = async (value: PomodoroFocusType) => {
-    // BUG : on first pomodoro focus pomodoro
-    // it will increase the current counter 2 time
-    if (value === "Focus") {
-      setPomodoro(value);
-      return;
-    }
-    setPomodoro(value);
-    if (activePomodoro()) {
-      setActivePomodoro((prev) => {
-        if (prev) {
-          return { ...prev, current: prev.current + 1 };
-        }
-        return prev;
-      });
-      localStorage.setItem("activePomodoro", JSON.stringify(activePomodoro()));
-      const res = await fetch(`${API_ROOT}/pomodoros/edit`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: activePomodoro()?._id,
-          est: activePomodoro()?.end,
-          // FIXME : fix the type (it should not be (as ...))
-          // should infer the type
-          act: (activePomodoro() as PomodoroType).current + 1,
-        }),
-      });
-
-      if (res.status != 200) {
-        /// FIXME : set error///
-        throw Error("Error in creating a backlog task");
-      }
-      refetch();
-    }
+    setActiveDrag(null);
   };
 
   const handleActive = async (id: string) => {
     if (id === activePomodoro()?._id) return;
-    setActivePomodoro(pomodoros()?.find((item) => item._id == id));
-    activePomodoro() &&
-      localStorage.setItem("activePomodoro", JSON.stringify(activePomodoro()));
+    changeActivePomodoro(pomodoros()?.find((item) => item._id == id));
   };
 
   const makeTaskDone = async (id: string) => {
-    mutate((prev) => {
-      return prev.map((item) => {
-        if (item._id === id) {
-          return {
-            ...item,
-            done: !item.done,
-          };
-        }
-        return item;
-      });
-    });
-
-    const res = await fetch(`${API_ROOT}/pomodoros/done/${id}`, {
-      method: "PUT",
-    });
-
-    if (res.status != 200) {
-      mutate((prev) => {
-        return prev.map((item) => {
-          if (item._id === id) {
-            return {
-              ...item,
-              done: !item.done,
-            };
-          }
-          return item;
-        });
-      });
+    clientFilterDoneTask(id);
+    try {
+      await makeTaskDone(id);
+    } catch (error) {
+      clientFilterDoneTaskRevalidate(id);
     }
   };
 
   return (
-    <PomodoroContainer
-      selected={activePomodoro}
-      pomodoro={pomodoro}
-      changePomodoroState={handleChangePomodoroState}
-    >
+    <PomodoroContainer>
       <div style={{ height: "3rem", width: "100%", padding: "1rem" }}>
         {pomodoros.loading && "loading..."}
       </div>
-
       <DragDropProvider
         onDragStart={({ draggable }) => {
           console.log("drag start");
-          setActivePomodoroDragItem(draggable);
+          setActiveDrag(draggable);
         }}
         onDragEnd={onDragEnd}
         collisionDetector={closestCenter}
@@ -233,7 +144,7 @@ const Pomodoros: Component<Props> = () => {
                     disabled={activePomodoro()?._id == item._id}
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleMove(item._id, "Pomodoro");
+                      move(item._id, "Pomodoro");
                     }}
                   >
                     {"⬅"}
@@ -272,10 +183,6 @@ const Pomodoros: Component<Props> = () => {
                       current={item.current}
                       end={item.end}
                       id={item._id}
-                      revalidate={() => {
-                        // FIXME: add mutate instead of refetch again
-                        refetch();
-                      }}
                     >
                       <div>
                         <button onClick={() => setShowDetail("")}>
@@ -294,7 +201,7 @@ const Pomodoros: Component<Props> = () => {
         </SortableProvider>
         <DragOverlay>
           <PomodoroItemContainer
-            {...activePomodoroDragItem()}
+            {...activeDrag()}
             draggableId={"pomodoros-dnd"}
           >
             heyyyy

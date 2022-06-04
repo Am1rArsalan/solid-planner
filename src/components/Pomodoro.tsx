@@ -2,6 +2,7 @@ import { createSortable } from "@thisbeyond/solid-dnd";
 import { Accessor, Component, onCleanup, Show, ParentProps } from "solid-js";
 import { createStore } from "solid-js/store";
 import { timeMap } from "../constants/pomodoro";
+import { useStore } from "../store";
 import {
   PomodoroFocusType,
   PomodoroTimerState,
@@ -9,18 +10,12 @@ import {
 } from "../types/pomodoro";
 import styles from "./Pomodoro.module.css";
 
-type Props = ParentProps<{
-  selected: Accessor<PomodoroType | null>;
-  pomodoro: Accessor<PomodoroFocusType>;
-  changePomodoroState: (value: PomodoroFocusType) => void;
-}>;
+export const PomodoroContainer: Component<ParentProps> = ({ children }) => {
+  const [
+    { pomodoroState, activePomodoro },
+    { editPomodoro, changePomodoroStatus, cycleFocus, loadPomodoros },
+  ] = useStore();
 
-export const PomodoroContainer: Component<Props> = ({
-  children,
-  selected,
-  pomodoro,
-  changePomodoroState,
-}) => {
   const [state, setState] = createStore<{
     timerState: PomodoroTimerState;
     time: {
@@ -44,7 +39,7 @@ export const PomodoroContainer: Component<Props> = ({
   });
 
   const handleRun = () => {
-    if (selected()) {
+    if (activePomodoro()) {
       setState({
         ...state,
         timerState: state.timerState === "PLAY" ? "PAUSE" : "PLAY",
@@ -64,6 +59,24 @@ export const PomodoroContainer: Component<Props> = ({
       },
     });
   };
+  const handleChangePomodoroStatus = async (value: PomodoroFocusType) => {
+    // FIXME(BUG): on first pomodoro focus pomodoro
+    // it will increase the current counter 2 time
+    if (value === "Focus") {
+      changePomodoroStatus(value);
+      return;
+    }
+    changePomodoroStatus(value);
+    if (activePomodoro()) {
+      cycleFocus();
+      try {
+        await editPomodoro();
+        loadPomodoros();
+      } catch (error) {
+        /// FIXME : set error///
+      }
+    }
+  };
 
   // TODO : see if can be optimize
   const interval = setInterval(() => {
@@ -75,8 +88,10 @@ export const PomodoroContainer: Component<Props> = ({
         clone.time.seconds = clone.time.minutes - 1 >= 0 ? 59 : 0;
 
         if (clone.time.minutes - 1 < 0) {
-          changePomodoroState(pomodoro() == "Focus" ? "Rest" : "Focus");
-          clone.time.minutes = timeMap.get(pomodoro()) as number;
+          handleChangePomodoroStatus(
+            pomodoroState() == "Focus" ? "Rest" : "Focus"
+          );
+          clone.time.minutes = timeMap.get(pomodoroState()) as number;
           clone.timerState = "PAUSE";
           const audio = new Audio(
             "https://media.geeksforgeeks.org/wp-content/uploads/20190531135120/beep.mp3"
@@ -170,8 +185,9 @@ export const SortablePomodoroItem: Component<PomodoroItemProps> = ({
   handleActive,
   activePomodoro,
   done,
+  order,
 }) => {
-  const sortable = createSortable(_id);
+  const sortable = createSortable(`${_id}-${order}`);
   return (
     <div
       use:sortable

@@ -1,5 +1,6 @@
-import { Component, ParentProps, Show } from "solid-js";
+import { Component, ParentProps } from "solid-js";
 import { createStore } from "solid-js/store";
+import { useStore } from "../store";
 
 const API_ROOT = "http://localhost:8000";
 
@@ -7,7 +8,6 @@ type PomodoroItemConfigFormProps = ParentProps<{
   current: number;
   end: number;
   id: string;
-  revalidate: () => void;
 }>;
 
 const PomodoroItemConfigForm: Component<PomodoroItemConfigFormProps> = ({
@@ -15,8 +15,9 @@ const PomodoroItemConfigForm: Component<PomodoroItemConfigFormProps> = ({
   end,
   children,
   id,
-  revalidate,
 }) => {
+  const [_, { loadPomodoros }] = useStore();
+
   const [state, setState] = createStore<{
     act: number;
     est: number;
@@ -47,7 +48,8 @@ const PomodoroItemConfigForm: Component<PomodoroItemConfigFormProps> = ({
             /// FIXME : set error///
             throw Error("Error in creating a backlog task");
           }
-          revalidate();
+          // TODO :mutate this locally
+          loadPomodoros();
         }}
       >
         <div>

@@ -1,4 +1,4 @@
-import { Component, createResource, createSignal, For } from "solid-js";
+import { Component, createSignal, For } from "solid-js";
 import { BacklogsContainer, BacklogItem, SortableBacklogItem } from "./Backlog";
 import { PomodoroType } from "../types/pomodoro";
 import {
@@ -8,155 +8,108 @@ import {
   SortableProvider,
   closestCenter,
 } from "@thisbeyond/solid-dnd";
-import { API_ROOT } from "../constants/api";
 import { useStore } from "../store";
 
-type Props = {
-  moveBacklog: (id: string, currentStatus: "Backlog" | "Pomodoro") => void;
-};
-
-const Backlogs: Component<Props> = ({ moveBacklog }) => {
-  // backlogs
+const Backlogs: Component<{
+  move: (id: string, currentStatus: "Backlog" | "Pomodoro") => void;
+}> = ({ move }) => {
+  const [{ backlogs }, actions] = useStore();
   const [activeItem, setActiveItem] = createSignal(null);
-  const [store, actions] = useStore();
-  const backlogIds = () => store.backlogs().map((item) => item._id);
+  const backlogIds = () => backlogs().map((item) => item._id);
 
-  console.log(store, actions);
-  console.log(store.backlogs.loading);
-  console.log(store.backlogs());
-
-  // add task to backlogs
-  // TODO : make own resource
   const handleAdd = async (task: string) => {
     if (!task.length) return;
     const creationTime = new Date().toISOString();
-    const prev = store.backlogs();
 
-    actions.mutateBacklogs([
-      ...prev,
-      {
-        current: 0,
-        done: false,
-        end: 0,
-        isRemoved: false,
-        status: "Backlog",
+    actions.addPendingItem({
+      creationTime,
+      title: task,
+    });
+
+    try {
+      const addedTask = await actions.addBacklog({
         title: task,
-        updated_at: creationTime,
-        created_at: creationTime,
-        order: prev.length + 1,
-        _id: "Pending",
-      },
-    ]);
-
-    const res = actions.addBacklog(
-      {
-        title: task,
-        order: store.backlogs().length,
-      },
-      store.token
-    );
-    //const res = await fetch(`${API_ROOT}/pomodoros`, {
-    //method: "POST",
-    //headers: {
-    //"Content-Type": "application/json",
-    //},
-    //body: JSON.stringify({}),
-    //});
-
-    if (res.status != 201) {
-      actions.mutateBacklogs(
-        store.backlogs().filter((item) => item.created_at !== creationTime)
-      );
+        order: backlogs().length,
+      });
+      actions.revalidateAddedItem(addedTask, creationTime);
+    } catch (error) {
+      actions.removePendingItem(creationTime);
     }
-    const addedTask = (await res.json()).data;
-
-    actions.mutateBacklogs(
-      store.backlogs().map((item) => {
-        if (item.created_at === creationTime) {
-          return addedTask;
-        }
-        return item;
-      })
-    );
   };
 
   const handleRemoveBacklog = async (id: string) => {
     if (id.length === 0) return;
     // FIXME: redo this types
 
-    let removedItemIndex = store
-      .backlogs()
-      .findIndex((item) => item._id == id) as number;
-    let removedItem = store.backlogs()[removedItemIndex] as PomodoroType;
+    let removedItemIndex = backlogs().findIndex(
+      (item) => item._id == id
+    ) as number;
+    let removedItem = backlogs()[removedItemIndex] as PomodoroType;
 
-    actions.mutateBacklogs(store.backlogs()?.filter((item) => item._id !== id));
-    const res = await fetch(`${API_ROOT}/pomodoros/${id}`, {
-      method: "DELETE",
-    });
-
-    // TODO : correct the recovery index
-    // TODO : if there was an error add the item in removedItemIndex
-    if (res.status != 200) {
-      actions.mutateBacklogs([...store.backlogs(), removedItem]);
-      throw Error("Error in removing a backlog task");
+    actions.mutateBacklogs(backlogs()?.filter((item) => item._id !== id));
+    try {
+      await actions.remove(id);
+    } catch (error) {
+      actions.mutateBacklogs([...backlogs(), removedItem]);
     }
-  };
-
-  const onDragEnd = async ({ draggable, droppable }) => {
-    if (draggable && droppable) {
-      const currentItems = store.backlogs();
-      const fromIndex = currentItems.findIndex(
-        (item) => item._id === draggable.id
-      );
-      const toIndex = currentItems.findIndex(
-        (item) => item._id === droppable.id
-      );
-
-      if (fromIndex !== toIndex) {
-        let updatedItems = currentItems.slice();
-        console.log(updatedItems);
-        updatedItems.splice(toIndex, 0, ...updatedItems.splice(fromIndex, 1));
-
-        actions.mutateBacklogs(updatedItems);
-        console.log(updatedItems);
-
-        const res = await fetch(`${API_ROOT}/pomodoros/order`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            orders: updatedItems.map((item, order) => ({
-              ...item,
-              order: order + 1,
-            })),
-            status: "Backlog",
-          }),
-        });
-
-        if (res.status !== 200) {
-          // </div> </div>
-        }
-      }
-    }
-    setActiveItem(null);
   };
 
   return (
     <DragDropProvider
       onDragStart={({ draggable }) => {
-        setActiveItem(draggable);
+        setActiveItem(draggable.id);
       }}
-      onDragEnd={onDragEnd}
+      onDragEnd={async ({ draggable, droppable }) => {
+        if (draggable && droppable) {
+          const currentItems = backlogs();
+          const fromIndex = currentItems.findIndex(
+            (item) => `${item._id}-${item.order}` === draggable.id
+          );
+          const toIndex = currentItems.findIndex(
+            (item) => `${item._id}-${item.order}` === droppable?.id
+          );
+
+          if (
+            currentItems[fromIndex]._id.includes("Pending") ||
+            currentItems[toIndex]._id.includes("Pending")
+          ) {
+            return;
+          }
+
+          if (fromIndex !== toIndex) {
+            let updatedItems = currentItems.slice();
+            updatedItems.splice(
+              toIndex,
+              0,
+              ...updatedItems.splice(fromIndex, 1)
+            );
+
+            actions.mutateBacklogs(updatedItems);
+
+            try {
+              await actions.changeOrder({
+                orders: updatedItems.map((item, order) => ({
+                  ...item,
+                  order: order + 1,
+                })),
+                status: "Backlog",
+              });
+            } catch {
+              // handle error
+            }
+          }
+        }
+        setActiveItem(null);
+      }}
       collisionDetector={closestCenter}
     >
       <BacklogsContainer handleAdd={handleAdd}>
         <div style={{ height: "3rem", width: "100%", padding: "1rem" }}>
-          {store.backlogs.loading && "loading..."}
+          {backlogs.loading && "loading..."}
         </div>
         <DragDropSensors />
-        <SortableProvider ids={backlogIds() || []}>
-          <For each={store.backlogs()}>
+        <SortableProvider ids={backlogIds()}>
+          <For each={backlogs()}>
             {(task) => (
               <SortableBacklogItem
                 backlog={task}
@@ -164,7 +117,7 @@ const Backlogs: Component<Props> = ({ moveBacklog }) => {
               >
                 <button
                   disabled={task._id === "Pending"}
-                  onClick={() => moveBacklog(task._id, "Backlog")}
+                  onClick={() => move(task._id, "Backlog")}
                 >
                   {"➡"}
                 </button>
