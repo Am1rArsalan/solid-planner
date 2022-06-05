@@ -201,7 +201,7 @@ const Pomodoros: Component<{
         </SortableProvider>
         <DragOverlay>
           <PomodoroItemContainer
-            {...activeDrag()}
+            activePomodoro={activeDrag}
             draggableId={"pomodoros-dnd"}
           >
             heyyyy
