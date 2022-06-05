@@ -1,6 +1,5 @@
 import { createResource } from "solid-js";
 import type { Resource } from "solid-js";
-import { SetStoreFunction } from "solid-js/store";
 import { StoreType } from "../types/store";
 import { BacklogType, PomodoroType } from "../types/pomodoro";
 import { fetchPomodoros, makeTaskDone } from "../api/pomodoros";
@@ -15,8 +14,7 @@ export interface PomodoroActions {
 
 export default function createPomodoros(
   actions: any,
-  state: StoreType,
-  setState: SetStoreFunction<StoreType>
+  state: StoreType
 ): Resource<PomodoroType[]> {
   const [pomodoros, { mutate, refetch }] = createResource<PomodoroType[]>(
     async () => await fetchPomodoros(state.token),
@@ -39,6 +37,9 @@ export default function createPomodoros(
     },
 
     clientRemove(id: string) {
+      if (id === state.activePomodoro()?._id) {
+        actions.changeActivePomodoro(null);
+      }
       mutate((prev) => {
         return prev?.filter((item) => item._id !== id);
       });
