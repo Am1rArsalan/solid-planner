@@ -1,7 +1,7 @@
 import { createSortable } from "@thisbeyond/solid-dnd";
 import { Component, ParentProps } from "solid-js";
 import { createStore } from "solid-js/store";
-import { PomodoroType } from "../types/pomodoro";
+import { BacklogType, PomodoroType } from "../types/pomodoro";
 import styles from "./Backlog.module.css";
 
 type Props = ParentProps<{
@@ -57,7 +57,7 @@ export const BacklogsContainer: Component<Props> = ({
 };
 
 export const SortableBacklogItem: Component<
-  ParentProps<{ backlog: PomodoroType; draggableId: string }>
+  ParentProps<{ backlog: BacklogType; draggableId: string }>
 > = (props) => {
   const { children, backlog } = props;
   const sortable = createSortable(`${backlog._id}-${backlog.order}`);
@@ -75,7 +75,7 @@ export const SortableBacklogItem: Component<
 };
 
 export const BacklogItem: Component<
-  ParentProps<{ backlog: PomodoroType | null; draggableId: string }>
+  ParentProps<{ backlog: BacklogType | null; draggableId: string }>
 > = (props) => {
   const { children, backlog } = props;
 

@@ -40,7 +40,6 @@ const Backlogs: Component<{
   const handleRemoveBacklog = async (id: string) => {
     if (id.length === 0) return;
     // FIXME: redo this types
-
     let removedItemIndex = backlogs().findIndex(
       (item) => item._id == id
     ) as number;
@@ -57,7 +56,7 @@ const Backlogs: Component<{
   return (
     <DragDropProvider
       onDragStart={({ draggable }) => {
-        setActiveItem(draggable.id);
+        setActiveItem(draggable);
       }}
       onDragEnd={async ({ draggable, droppable }) => {
         if (draggable && droppable) {
@@ -68,14 +67,12 @@ const Backlogs: Component<{
           const toIndex = currentItems.findIndex(
             (item) => `${item._id}-${item.order}` === droppable?.id
           );
-
           if (
             currentItems[fromIndex]._id.includes("Pending") ||
             currentItems[toIndex]._id.includes("Pending")
           ) {
             return;
           }
-
           if (fromIndex !== toIndex) {
             let updatedItems = currentItems.slice();
             updatedItems.splice(
@@ -85,7 +82,6 @@ const Backlogs: Component<{
             );
 
             actions.mutateBacklogs(updatedItems);
-
             try {
               await actions.changeOrder({
                 orders: updatedItems.map((item, order) => ({
