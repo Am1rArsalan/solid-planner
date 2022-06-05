@@ -1,7 +1,7 @@
-import { PomodoroType, TaskType } from "./pomodoro";
+import { TaskType } from "./pomodoro";
 
 export type ChangeOrderDto = {
-  newOrder: PomodoroType[];
+  orders: TaskType[];
   status: "Backlog" | "Pomodoro";
 };
 
