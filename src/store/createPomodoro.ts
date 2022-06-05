@@ -10,11 +10,7 @@ export interface PomodoroActions {
   //
 }
 
-export default function createPomodoro(
-  actions: any,
-  state: StoreType,
-  setState: SetStoreFunction<StoreType>
-) {
+export default function createPomodoro(actions: any, state: StoreType) {
   const [pomodoroState, setPomodoroState] =
     createSignal<PomodoroFocusType>("Focus");
   const selectedPomodoro = localStorage.getItem("activePomodoro");

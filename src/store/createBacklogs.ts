@@ -1,7 +1,6 @@
 // FIXME => never & any
 import { createResource } from "solid-js";
 import type { Resource } from "solid-js";
-import { SetStoreFunction } from "solid-js/store";
 import { StoreType } from "../types/store";
 import { BacklogType, CreateDto, PomodoroType } from "../types/pomodoro";
 import { fetchBacklogs, addBacklog } from "../api/backlogs";
@@ -16,8 +15,7 @@ export interface BacklogActions {
 // TODO: remove never
 export default function createBacklogs(
   actions: any,
-  state: StoreType,
-  setState: SetStoreFunction<StoreType>
+  state: StoreType
 ): Resource<BacklogType[]> {
   const [backlogs, { mutate, refetch }] = createResource<BacklogType[]>(
     async () => await fetchBacklogs(state.token),
