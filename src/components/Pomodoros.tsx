@@ -168,7 +168,6 @@ const Pomodoros: Component<{
                     {"✔"}
                   </button>
                   <button
-                    disabled={activePomodoro()?._id == item._id}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleRemovePomodoro(item._id);
