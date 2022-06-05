@@ -48,9 +48,9 @@ export const Provider: Component<Props> = (props) => {
   const actions: any = {};
   const store: [StoreType, any] = [state, actions];
 
-  backlogs = createBacklogs(actions, state, setState);
-  pomodoros = createPomodoros(actions, state, setState);
-  const singlePomodoro = createPomodoro(actions, state, setState);
+  backlogs = createBacklogs(actions, state);
+  pomodoros = createPomodoros(actions, state);
+  const singlePomodoro = createPomodoro(actions, state);
   pomodoroState = singlePomodoro.pomodoroState;
   activePomodoro = singlePomodoro.activePomodoro;
 
