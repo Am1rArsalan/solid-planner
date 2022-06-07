@@ -38,3 +38,73 @@
   align-items: center;
   gap: 1rem;
 }
+
+.OpenFormButton {
+  opacity: 0.8;
+  width: 34rem;
+  padding: 1rem;
+  height: 6rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border: 2px dashed rgba(255, 255, 255, 0.4);
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #fff;
+}
+
+.OpenFormButton:hover {
+  opacity: 1;
+}
+
+.OpenFormButton span {
+  font-weight: bold;
+  opacity: 0.8;
+  color: #fff;
+  margin-left: 0.4rem;
+  font-size: 1.6rem;
+}
+
+.AddForm {
+  background-color: white;
+  border-radius: 8px;
+  text-align: left;
+  margin-top: 1.2rem;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 10px 20px, rgba(0, 0, 0, 0.1) 0px 3px 6px;
+  animation: 0.1s ease-in-out 0s 1 normal none running expand;
+}
+
+.AddForm input {
+  border-radius: 4px;
+  font-size: 2.2rem;
+  padding: 1rem 0;
+  box-shadow: none;
+  border: none;
+  color: rgb(85, 85, 85);
+  width: 100%;
+  box-sizing: border-box;
+  font-weight: bold;
+}
+
+.AddForm input::placeholder {
+  color: rgb(221, 221, 221);
+}
+
+.FormBody {
+  padding: 10px 20px 0px;
+}
+
+.FormFooter {
+  padding: 1.4rem 2rem;
+  text-align: right;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  background-color: rgb(239, 239, 239);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.FormController {
+  /**/
+}

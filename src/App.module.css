@@ -3,11 +3,13 @@
   justify-content: space-around;
   height: 100vh;
   width: 100vw;
-  background-color: orange;
+  background-color: rgb(217, 85, 80);
+  /* temporary */
+  color: white;
 }
 
 .BlueApp {
-  background-color: blue;
+  background-color: rgb(76, 145, 149);
 }
 
 /* Tasks */

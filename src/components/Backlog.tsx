@@ -1,8 +1,9 @@
 import { createSortable } from "@thisbeyond/solid-dnd";
-import { Component, ParentProps } from "solid-js";
+import { Component, createSignal, ParentProps, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import { BacklogType, PomodoroType } from "../types/pomodoro";
 import styles from "./Backlog.module.css";
+import Add from "./UI/icons/Add";
 
 type Props = ParentProps<{
   handleAdd: (value: string) => void;
@@ -12,6 +13,7 @@ export const BacklogsContainer: Component<Props> = ({
   children,
   handleAdd,
 }) => {
+  const [showForm, setShowForm] = createSignal(false);
   const [state, setState] = createStore<{
     value: string;
     isSubmitting: boolean;
@@ -39,18 +41,39 @@ export const BacklogsContainer: Component<Props> = ({
   return (
     <div class={styles.Backlog}>
       <h2> Backlogs</h2>
-      <form
-        onSubmit={(ev) => {
-          ev.preventDefault();
-          handleSubmit();
-        }}
+      <Show
+        when={showForm()}
+        fallback={
+          <button
+            class={styles.OpenFormButton}
+            onClick={() => setShowForm(true)}
+          >
+            <Add width={20} height={20} />
+            <span>Add Task</span>
+          </button>
+        }
       >
-        <input
-          value={state.value}
-          onChange={handleChangeValue}
-          class={styles.TaskInput}
-        />
-      </form>
+        <form
+          onSubmit={(ev) => {
+            ev.preventDefault();
+            handleSubmit();
+          }}
+          class={styles.AddForm}
+        >
+          <div class={styles.FormBody}>
+            <div class={styles.FormController}>
+              <input
+                value={state.value}
+                onChange={handleChangeValue}
+                class={styles.TaskInput}
+                placeholder="What's the task title?"
+              />
+            </div>
+            <div class={styles.FormController}></div>
+          </div>
+          <div class={styles.FormFooter}>fkdsajfjdsa</div>
+        </form>
+      </Show>
       {children}
     </div>
   );
