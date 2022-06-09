@@ -17,7 +17,7 @@ export async function fetchBacklogs(
 export async function addBacklog(
   data: CreateDto,
   token: string | null
-): Promise<PomodoroType[]> {
+): Promise<BacklogType[]> {
   try {
     const result = await createHttpRequest<CreateDto>(
       "POST",
