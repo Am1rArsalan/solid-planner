@@ -70,7 +70,10 @@ export const PomodoroContainer: Component<ParentProps> = ({ children }) => {
     if (activePomodoro()) {
       cycleFocus();
       try {
-        await editPomodoro();
+        // FIXME : ...
+        const data = activePomodoro() as PomodoroType;
+        await editPomodoro(data._id, data.end, data.current + 1, data.title);
+
         loadPomodoros();
       } catch (error) {
         /// FIXME : set error///
