@@ -1,22 +1,35 @@
-// FIXME => never & any
 import { createResource } from "solid-js";
 import type { Resource } from "solid-js";
 import { StoreType } from "../types/store";
-import { BacklogType, CreateDto, PomodoroType } from "../types/pomodoro";
+import {
+  BacklogType,
+  CreateDto,
+  CreatePendingItemDto,
+  PomodoroType,
+} from "../types/pomodoro";
 import { fetchBacklogs, addBacklog } from "../api/backlogs";
 import { changeOrder, removePomodoro } from "../api/shared";
-import { Actions } from ".";
 import { ChangeOrderDto } from "../types/shared";
+import { Actions } from ".";
 
 export interface BacklogActions {
-  //
+  loadBacklogs(): BacklogType[] | Promise<BacklogType[]> | undefined | null;
+  mutateBacklogs(data: BacklogType[]): BacklogType[];
+  addBacklog(data: CreateDto): Promise<BacklogType[]>;
+  addPendingItem(data: CreatePendingItemDto): void;
+  removePendingItem(creationTime: string): void;
+  revalidateAddedItem(addedTask: BacklogType, creationTime: string): void;
+  removeBacklog(id: string): Promise<BacklogType>;
+  changeOrder(data: ChangeOrderDto): Promise<BacklogType[]>;
+  moveBacklogItemAndReOrder(id: string): void;
+  addMovedPomodoroItem(movedItem: PomodoroType): void;
 }
 
-// TODO: remove never
 export default function createBacklogs(
-  actions: any,
+  actions: Actions,
   state: StoreType
 ): Resource<BacklogType[]> {
+  console.log("start of create backlog");
   const [backlogs, { mutate, refetch }] = createResource<BacklogType[]>(
     async () => await fetchBacklogs(state.token),
     {
@@ -34,8 +47,7 @@ export default function createBacklogs(
     addBacklog(data: CreateDto) {
       return addBacklog(data, state.token);
     },
-
-    addPendingItem(data: { title: string; creationTime: string }) {
+    addPendingItem(data: CreatePendingItemDto) {
       mutate((prev) => [
         ...prev,
         {
@@ -52,12 +64,10 @@ export default function createBacklogs(
         },
       ]);
     },
-
     removePendingItem(creationTime: string) {
       mutate((prev) => prev.filter((item) => item.created_at !== creationTime));
     },
-
-    revalidateAddedItem(addedTask: any, creationTime: string) {
+    revalidateAddedItem(addedTask: BacklogType, creationTime: string) {
       mutate((prev) =>
         prev.map((item) => {
           if (item.created_at === creationTime) {
@@ -67,15 +77,12 @@ export default function createBacklogs(
         })
       );
     },
-
-    remove(id: string) {
-      return removePomodoro(id, state.token);
+    removeBacklog(id: string) {
+      return removePomodoro<BacklogType>(id, state.token);
     },
-
     changeOrder(data: ChangeOrderDto) {
-      return changeOrder(data, state.token);
+      return changeOrder<BacklogType>(data, state.token);
     },
-
     moveBacklogItemAndReOrder(id: string) {
       mutate((prev) => {
         return prev
@@ -83,7 +90,6 @@ export default function createBacklogs(
           .map((item, order) => ({ ...item, order: order + 1 }));
       });
     },
-
     addMovedPomodoroItem(movedItem: PomodoroType) {
       mutate((prev) => {
         return [
