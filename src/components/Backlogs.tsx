@@ -30,6 +30,7 @@ const Backlogs: Component<{
       const addedTask = await actions.addBacklog({
         title: task,
         order: backlogs().length,
+        end: 0,
       });
       actions.revalidateAddedItem(addedTask, creationTime);
     } catch (error) {
@@ -43,11 +44,13 @@ const Backlogs: Component<{
     let removedItemIndex = backlogs().findIndex(
       (item) => item._id == id
     ) as number;
-    let removedItem = backlogs()[removedItemIndex] as PomodoroType;
+    if (removedItemIndex == -1) return;
+
+    let removedItem = backlogs()[removedItemIndex];
 
     actions.mutateBacklogs(backlogs()?.filter((item) => item._id !== id));
     try {
-      await actions.remove(id);
+      await actions.removeBacklog(id);
     } catch (error) {
       actions.mutateBacklogs([...backlogs(), removedItem]);
     }
