@@ -1,16 +1,17 @@
 import { createSignal } from "solid-js";
-import { SetStoreFunction } from "solid-js/store";
 import { StoreType } from "../types/store";
 import { PomodoroFocusType, PomodoroType } from "../types/pomodoro";
-import { Actions } from ".";
+import { Actions } from "./";
 import { editPomodoro } from "../api/pomodoro";
 
-// TODO
 export interface PomodoroActions {
-  //
+  changePomodoroStatus(value: PomodoroFocusType): void;
+  editPomodoro(id: string, end: number, act: number, title: string): void;
+  changeActivePomodoro(activeItem: PomodoroType | null): void;
+  cycleFocus(): void;
 }
 
-export default function createPomodoro(actions: any, state: StoreType) {
+export default function createPomodoro(actions: Actions, state: StoreType) {
   const [pomodoroState, setPomodoroState] =
     createSignal<PomodoroFocusType>("Focus");
   const selectedPomodoro = localStorage.getItem("activePomodoro");
@@ -22,14 +23,13 @@ export default function createPomodoro(actions: any, state: StoreType) {
     changePomodoroStatus(value: PomodoroFocusType) {
       setPomodoroState(value);
     },
-    editPomodoro() {
+    editPomodoro(id: string, end: number, act: number, title: string) {
       return editPomodoro(
         {
-          id: activePomodoro()?._id,
-          est: activePomodoro()?.end,
-          // FIXME : fix the type (it should not be (as ...))
-          // should infer the type
-          act: (activePomodoro() as PomodoroType).current + 1,
+          id: id,
+          est: end,
+          act: act,
+          title,
         },
         state.token
       );
