@@ -1,11 +1,11 @@
-import { PomodoroType } from "../types/pomodoro";
+import { PomodoroType, TaskBaseType } from "../types/pomodoro";
 import { ChangeOrderDto, ChangeTaskStatusDto } from "../types/shared";
 import { createFetchHttpRequest, createHttpRequest } from "./createHttpRequest";
 
-export async function removePomodoro(
+export async function removePomodoro<T>(
   id: string,
   token: string | null
-): Promise<PomodoroType[]> {
+): Promise<T> {
   try {
     const result = await createFetchHttpRequest(
       "DELETE",
@@ -20,10 +20,10 @@ export async function removePomodoro(
   }
 }
 
-export async function changeOrder(
+export async function changeOrder<T>(
   data: ChangeOrderDto,
   token: string | null
-): Promise<PomodoroType[]> {
+): Promise<T[]> {
   try {
     const result = await createHttpRequest(
       "POST",
