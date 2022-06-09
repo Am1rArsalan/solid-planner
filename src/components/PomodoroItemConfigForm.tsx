@@ -16,7 +16,7 @@ const PomodoroItemConfigForm: Component<PomodoroItemConfigFormProps> = ({
   children,
   id,
 }) => {
-  const [_, { loadPomodoros }] = useStore();
+  const [_, { loadPomodoros, editPomodoro }] = useStore();
 
   const [state, setState] = createStore<{
     act: number;
@@ -34,22 +34,14 @@ const PomodoroItemConfigForm: Component<PomodoroItemConfigFormProps> = ({
           width: "100%",
         }}
         onSubmit={async (e) => {
-          // TODO : add optimistic ui
           e.preventDefault();
-          const res = await fetch(`${API_ROOT}/pomodoros/edit`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ id, act: state.act, est: state.est }),
-          });
 
-          if (res.status != 200) {
-            /// FIXME : set error///
-            throw Error("Error in creating a backlog task");
+          try {
+            await editPomodoro(id, state.est, state.act);
+            loadPomodoros();
+          } catch (error) {
+            // TODO : handle error
           }
-          // TODO :mutate this locally
-          loadPomodoros();
         }}
       >
         <div>
