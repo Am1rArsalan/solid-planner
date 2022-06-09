@@ -7,49 +7,48 @@ import {
   PomodoroType,
 } from "../types/pomodoro";
 import { StoreType } from "../types/store";
-import createBacklogs from "./createBacklogs";
-import createPomodoro from "./createPomodoro";
-import createPomodoros from "./createPomodoros";
+import createBacklogs, { BacklogActions } from "./createBacklogs";
+import createPomodoro, { PomodoroActions } from "./createPomodoro";
+import createPomodoros, { PomodorosActions } from "./createPomodoros";
 
-const StoreContext = createContext<[StoreType, any]>();
+// I don't like this
+export interface Actions
+  extends BacklogActions,
+    PomodoroActions,
+    PomodorosActions {}
+
+type StoreContextType = [StoreType, Actions];
+
+const StoreContext = createContext<StoreContextType>();
 const RouterContext = createContext();
 
-type Props = ParentProps<{}>;
-
-export interface Actions {
-  //
-}
-
-export const Provider: Component<Props> = (props) => {
+export const Provider: Component<ParentProps> = (props) => {
   let backlogs: Resource<BacklogType[]>;
   let pomodoros: Resource<PomodoroType[]>;
   let pomodoroState: Accessor<PomodoroFocusType>;
   let activePomodoro: Accessor<PomodoroType | null>;
 
-  const [state, setState] = createStore<StoreType>({
+  const [state] = createStore<StoreType>({
     token: localStorage.getItem("jwt"),
     get backlogs() {
       return backlogs;
     },
-
     get pomodoros() {
       return pomodoros;
     },
-
     get pomodoroState() {
       return pomodoroState;
     },
-
     get activePomodoro() {
       return activePomodoro;
     },
   });
 
-  const actions: any = {};
-  const store: [StoreType, any] = [state, actions];
+  const actions: Actions = Object({});
+  const store: StoreContextType = [state, actions];
 
   backlogs = createBacklogs(actions, state);
-  pomodoros = createPomodoros(actions, state);
+  pomodoros = createPomodoros({ actions, state });
   const singlePomodoro = createPomodoro(actions, state);
   pomodoroState = singlePomodoro.pomodoroState;
   activePomodoro = singlePomodoro.activePomodoro;
@@ -62,8 +61,7 @@ export const Provider: Component<Props> = (props) => {
 };
 
 export function useStore() {
-  // FIX typescript error
-  const store = useContext<[StoreType, any]>(StoreContext);
+  const store = useContext<StoreContextType>(StoreContext);
   return store;
 }
 
