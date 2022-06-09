@@ -1,7 +1,7 @@
 import { createSortable } from "@thisbeyond/solid-dnd";
 import { Component, createSignal, ParentProps, Show } from "solid-js";
 import { createStore } from "solid-js/store";
-import { BacklogType, PomodoroType } from "../types/pomodoro";
+import { BacklogType } from "../types/pomodoro";
 import styles from "./Backlog.module.css";
 import Add from "./UI/icons/Add";
 
