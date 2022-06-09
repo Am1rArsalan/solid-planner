@@ -22,17 +22,17 @@ const App: Component = () => {
     currentStatus: "Backlog" | "Pomodoro"
   ) => {
     if (id.length === 0) return;
-    let removedItemIndex, removedItem: TaskType | undefined;
+    let removedIndex, removedItem: TaskType | undefined;
     if (currentStatus === "Pomodoro") {
-      removedItemIndex = pomodoros()?.findIndex((item) => item._id == id);
-      if (removedItemIndex == -1) return;
-      removedItem = pomodoros()[removedItemIndex];
+      removedIndex = pomodoros()?.findIndex((item) => item._id == id);
+      if (removedIndex == -1) return;
+      removedItem = pomodoros()[removedIndex];
       moveItemAndOrderItems(id);
       addMovedPomodoroItem(removedItem);
     } else {
-      removedItemIndex = backlogs()?.findIndex((item) => item._id == id);
-      if (removedItemIndex == -1) return;
-      removedItem = backlogs()[removedItemIndex];
+      removedIndex = backlogs()?.findIndex((item) => item._id == id);
+      if (removedIndex == -1) return;
+      removedItem = backlogs()[removedIndex];
       moveBacklogItemAndReOrder(id);
       addMovedBacklogItem(removedItem);
     }
