@@ -53,7 +53,7 @@ const PomodoroEditForm: Component<Props> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} class={styles.AddForm}>
+    <form onSubmit={handleSubmit} class={styles.Form}>
       <div class={styles.FormBody}>
         <div class={styles.FormController}>
           <input
