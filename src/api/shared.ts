@@ -1,4 +1,4 @@
-import { PomodoroType, TaskBaseType } from "../types/pomodoro";
+import { PomodoroType } from "../types/pomodoro";
 import { ChangeOrderDto, ChangeTaskStatusDto } from "../types/shared";
 import { createFetchHttpRequest, createHttpRequest } from "./createHttpRequest";
 
