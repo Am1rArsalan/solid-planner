@@ -19,14 +19,16 @@
 }
 
 .FormBody {
-  padding: 10px 20px 0px;
+  padding: 1rem 2rem 0px;
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  width: calc(100% - 4rem);
 }
 
 .FormFooter {
-  padding: 1.4rem 2rem;
+  width: calc(100% - 3rem);
+  padding: 1.5rem;
   text-align: right;
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
@@ -36,7 +38,7 @@
   align-items: center;
 }
 
-.AddForm {
+.Form {
   background-color: white;
   border-radius: 8px;
   text-align: left;
@@ -48,9 +50,11 @@
   gap: 2rem;
   align-items: center;
   justify-content: center;
+  width: 100%;
 }
 
-.AddForm input {
+.Form input {
+  width: 100%;
   border-radius: 4px;
   font-size: 2.5rem;
   padding: 1rem 0;
@@ -63,7 +67,7 @@
 }
 
 .AddForm input::placeholder {
-  color: rgb(221, 221, 221);
+  color: rgba(221, 221, 221, 0.1);
 }
 
 .ShowEst {

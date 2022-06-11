@@ -1,7 +1,3 @@
-.ActivePomodoro {
-  background-color: lightgreen;
-}
-
 .PomodoroTitle {
   width: 60%;
   font-size: 1.75rem;
@@ -28,7 +24,7 @@
   padding: 1.8rem 1rem;
 }
 
-.PomodoroItem[aria-label="active"] {
+.PomodoroItem[aria-label="true"] {
   border-left: 6px solid rgb(34, 34, 34);
 }
 
