@@ -2,6 +2,7 @@ import { Component } from "solid-js";
 import styles from "./App.module.css";
 import Backlogs from "./components/Backlogs";
 import Pomodoros from "./components/Pomodoros";
+import { classNames } from "./components/UI/utils/classNames";
 import { useStore } from "./store";
 import { BacklogType, PomodoroType, TaskType } from "./types/pomodoro";
 
@@ -58,17 +59,16 @@ const App: Component = () => {
   };
 
   return (
-    <div
-      class={
-        pomodoroState() == "Focus"
-          ? styles.App
-          : [styles.App, styles.BlueApp].join(" ")
-      }
-    >
-      <div class={styles.Tasks}>
-        <Backlogs move={handleMove} />
-        <Pomodoros move={handleMove} />
-      </div>
+    <div class={styles.App}>
+      <div
+        class={
+          pomodoroState() === "Focus"
+            ? styles.Background
+            : classNames(styles.Background, styles.BlueBackground)
+        }
+      />
+      <Backlogs move={handleMove} />
+      <Pomodoros move={handleMove} />
     </div>
   );
 };
