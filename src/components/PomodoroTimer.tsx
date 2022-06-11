@@ -123,13 +123,27 @@ const PomodoroTimer: Component<ParentProps> = (props) => {
     <div class={styles.Pomodoro}>
       <div class={styles.PomodoroFocusManagementWrapper}>
         <div class={styles.SelectPomodoroFocusTypeButtonsWrapper}>
-          <Button class={styles.SelectPomodoroFocusTypeButton}>Pomodoro</Button>
-          <Button class={styles.SelectPomodoroFocusTypeButton}>
+          <Button
+            aria-label={`${pomodoroState() === "Focus"}`}
+            class={styles.SelectPomodoroFocusTypeButton}
+            onClick={() =>
+              pomodoroState() !== "Focus" && changePomodoroStatus("Focus")
+            }
+          >
+            Pomodoro
+          </Button>
+          <Button
+            aria-label={`${pomodoroState() === "Rest"}`}
+            class={styles.SelectPomodoroFocusTypeButton}
+            onClick={() =>
+              pomodoroState() !== "Rest" && changePomodoroStatus("Rest")
+            }
+          >
             Short Break
           </Button>
-          <Button class={styles.SelectPomodoroFocusTypeButton}>
+          {/*<Button class={styles.SelectPomodoroFocusTypeButton}>
             Long Break
-          </Button>
+          </Button> */}
         </div>
         <div class={styles.Timer}>
           <Show
