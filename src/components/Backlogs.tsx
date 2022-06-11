@@ -139,7 +139,6 @@ const BacklogsContainer: Component<ParentProps> = (props) => {
 
   return (
     <div class={styles.Backlogs}>
-      <h2 class={styles.BacklogsHeader}> Backlogs </h2>
       <Show
         when={showForm()}
         fallback={
@@ -148,7 +147,7 @@ const BacklogsContainer: Component<ParentProps> = (props) => {
             onClick={() => setShowForm(true)}
           >
             <Add fill="#fff" width={20} height={20} />
-            <span>Add Backlog</span>
+            <span>Add Task To Backlogs</span>
           </Button>
         }
       >
