@@ -2,7 +2,7 @@ import { Component } from "solid-js";
 import { IconProps } from "./IconProps";
 
 export const ArrowUp: Component<IconProps> = (props) => {
-  const { width, height, fill } = props;
+  const { width, height, fill, rest } = props;
 
   return (
     <svg
@@ -11,6 +11,7 @@ export const ArrowUp: Component<IconProps> = (props) => {
       width={width}
       height={height}
       fill={fill}
+      {...rest}
     >
       <g transform="rotate(-90 8 8)">
         <g transform="translate(2 2)">

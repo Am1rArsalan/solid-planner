@@ -1,8 +1,8 @@
 import { Component } from "solid-js";
 import { IconProps } from "./IconProps";
 
-export const ArrowDownSmall: Component<IconProps> = (props) => {
-  const { width, height, fill } = props;
+export const ArrowDown: Component<IconProps> = (props) => {
+  const { width, height, fill, ...rest } = props;
 
   return (
     <svg
@@ -11,6 +11,7 @@ export const ArrowDownSmall: Component<IconProps> = (props) => {
       width={width}
       height={height}
       fill={fill}
+      {...rest}
     >
       <g transform="rotate(90 8 8)">
         <g transform="translate(2 2)">
