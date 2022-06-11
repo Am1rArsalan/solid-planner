@@ -1,11 +1,7 @@
 import { Component } from "solid-js";
+import { IconProps } from "./IconProps";
 
-type Props = {
-  width: number;
-  height: number;
-};
-
-const Add: Component<Props> = ({ width, height }) => {
+const Add: Component<IconProps> = ({ width, height }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
