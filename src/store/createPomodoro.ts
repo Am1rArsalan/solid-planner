@@ -6,7 +6,7 @@ import { editPomodoro } from "../api/pomodoro";
 
 export interface PomodoroActions {
   changePomodoroStatus(value: PomodoroFocusType): void;
-  editPomodoro(id: string, end: number, act: number, title: string): void;
+  editPomodoro(id: string, end: number, act: number, title?: string): void;
   changeActivePomodoro(activeItem: PomodoroType | null): void;
   cycleFocus(): void;
 }
@@ -23,13 +23,13 @@ export default function createPomodoro(actions: Actions, state: StoreType) {
     changePomodoroStatus(value: PomodoroFocusType) {
       setPomodoroState(value);
     },
-    editPomodoro(id: string, end: number, act: number, title: string) {
+    editPomodoro(id: string, end: number, act: number, title?: string) {
       return editPomodoro(
         {
           id: id,
           est: end,
           act: act,
-          title,
+          title: title ? title : (activePomodoro()?.title as string),
         },
         state.token
       );
