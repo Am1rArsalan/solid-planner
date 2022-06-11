@@ -13,7 +13,7 @@ import { ArrowRight } from "./UI/icons/ArrowRight";
 import { Close } from "./UI/icons/Close";
 import Add from "./UI/icons/Add";
 import BacklogForm from "./BacklogForm";
-import styles from "./Backlog.module.css";
+import styles from "./styles/Backlogs.module.css";
 
 type Props = {
   move: (id: string, currentStatus: "Backlog" | "Pomodoro") => void;
@@ -84,7 +84,6 @@ const Backlogs: Component<Props> = (props) => {
     <DragDropProvider
       onDragStart={({ draggable }) => {
         setActiveItem(draggable);
-        return;
       }}
       onDragEnd={onDragEnd}
       collisionDetector={closestCenter}
@@ -118,9 +117,16 @@ const Backlogs: Component<Props> = (props) => {
           </For>
         </SortableProvider>
         <DragOverlay>
-          <BacklogItem backlog={activeItem()} draggableId={"backlogs()-dnd"}>
-            <button>{"➡"}</button>
-            <button>{"X"}</button>
+          <BacklogItem
+            backlog={activeItem()}
+            draggableId={`backlogs-dnd-${activeItem()?._id}`}
+          >
+            <Button>
+              <ArrowRight fill="#000" width={16} height={16} />
+            </Button>
+            <Button>
+              <Close fill="#000" width={18} height={18} />
+            </Button>
           </BacklogItem>
         </DragOverlay>
       </BacklogsContainer>

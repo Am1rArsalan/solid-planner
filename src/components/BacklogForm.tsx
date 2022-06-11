@@ -1,7 +1,7 @@
 import { Component } from "solid-js";
 import { createStore } from "solid-js/store";
 import { useStore } from "../store";
-import styles from "./BacklogForm.module.css";
+import styles from "./styles/BacklogForm.module.css";
 import { Button, IconButton } from "./UI/button";
 import { ArrowDown } from "./UI/icons/ArrowDown";
 import { ArrowUp } from "./UI/icons/ArrowUp";

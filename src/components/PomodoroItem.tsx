@@ -1,7 +1,7 @@
 import { createSortable } from "@thisbeyond/solid-dnd";
 import { Accessor, Component, ParentProps } from "solid-js";
 import { PomodoroType } from "../types/pomodoro";
-import styles from "./PomodoroItem.module.css";
+import styles from "./styles/PomodoroItem.module.css";
 import { classNames } from "./UI/utils/classNames";
 
 type Props = ParentProps<
@@ -17,7 +17,7 @@ export const PomodoroItem: Component<Props> = (props) => {
   return (
     <div
       class={
-        activePomodoro()?._id == _id
+        activePomodoro()?._id === _id
           ? !done
             ? classNames(styles.PomodoroItem, "sortable", styles.ActivePomodoro)
             : classNames(
@@ -41,14 +41,13 @@ export const PomodoroItem: Component<Props> = (props) => {
 export const SortablePomodoroItem: Component<Props> = (props) => {
   const { _id, title, children, handleActive, activePomodoro, done, order } =
     props;
-
   const sortable = createSortable(`${_id}-${order}`);
 
   return (
     <div
       use:sortable
       class={
-        activePomodoro()?._id == _id
+        activePomodoro()?._id === _id
           ? !done
             ? classNames(styles.PomodoroItem, "sortable", styles.ActivePomodoro)
             : classNames(

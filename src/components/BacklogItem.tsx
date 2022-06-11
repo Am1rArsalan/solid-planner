@@ -1,7 +1,7 @@
 import { createSortable } from "@thisbeyond/solid-dnd";
 import { Component, ParentProps } from "solid-js";
 import { BacklogType } from "../types/pomodoro";
-import styles from "./Backlog.module.css";
+import styles from "./styles/BacklogItem.module.css";
 import { classNames } from "./UI/utils/classNames";
 
 export const SortableBacklogItem: Component<
