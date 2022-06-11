@@ -7,7 +7,6 @@ import { changeOrder, changeTaskStatus, removePomodoro } from "../api/shared";
 import { Actions } from "./";
 import { ChangeOrderDto, ChangeTaskStatusDto } from "../types/shared";
 
-// TODO : CHECK THIS AGAIN
 export interface PomodorosActions {
   loadPomodoros(): PomodoroType[] | Promise<PomodoroType[]> | undefined | null;
   mutatePomodoros(data: PomodoroType[]): PomodoroType[];
