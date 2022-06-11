@@ -60,6 +60,8 @@ const App: Component = () => {
 
   return (
     <div class={styles.App}>
+      <Backlogs move={handleMove} />
+      <Pomodoros move={handleMove} />
       <div
         class={
           pomodoroState() === "Focus"
@@ -67,8 +69,6 @@ const App: Component = () => {
             : classNames(styles.Background, styles.BlueBackground)
         }
       />
-      <Backlogs move={handleMove} />
-      <Pomodoros move={handleMove} />
     </div>
   );
 };
