@@ -9,14 +9,60 @@
   gap: 1rem;
 }
 
+.PomodoroFocusManagementWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  width: 100%;
+  padding: 2rem 0;
+}
+
 .Timer {
-  font-size: 2rem;
+  font-size: 12rem;
+  font-weight: bold;
+  margin-top: 2rem;
+  color: #fff;
 }
 
 .TimerActionButton {
-  width: 2rem;
-  height: 2rem;
+  cursor: pointer;
+  border: none;
+  margin: 20px 0px 0px;
+  padding: 0px 12px;
+  border-radius: 4px;
+  box-shadow: rgb(235, 235, 235) 0px 6px 0px;
+  font-size: 2.2rem;
+  height: 5.5rem;
+  color: rgb(217, 85, 80);
+  font-weight: bold;
+  width: 20rem;
+  background-color: white;
+  transition: color 0.5s ease-in-out 0s;
+}
+
+.SelectPomodoroFocusTypeButton {
+  border: none;
+  margin: 0px;
+  border-radius: 4px;
+  font-size: 16px;
+  padding: 2px 12px;
+  height: 28px;
+  cursor: pointer;
+  background: none;
+  box-shadow: none;
+  color: white;
+  opacity: 1;
+  font-weight: bold;
+}
+
+.SelectPomodoroFocusTypeButton[aria-label="active"] {
+  background: none rgba(0, 0, 0, 0.15);
+}
+
+.SelectPomodoroFocusTypeButtonsWrapper {
   display: flex;
   justify-content: center;
+  width: 100%;
   align-items: center;
 }

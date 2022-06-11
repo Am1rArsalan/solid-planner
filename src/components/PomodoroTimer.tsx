@@ -1,4 +1,10 @@
-import { Component, onCleanup, ParentProps, Show } from "solid-js";
+import {
+  Component,
+  createEffect,
+  onCleanup,
+  ParentProps,
+  Show,
+} from "solid-js";
 import { createStore } from "solid-js/store";
 import { timeMap } from "../constants/pomodoro";
 import { useStore } from "../store";
@@ -7,7 +13,8 @@ import {
   PomodoroTimerState,
   PomodoroType,
 } from "../types/pomodoro";
-import styles from "./PomodoroTimer.module.css";
+import styles from "./styles/PomodoroTimer.module.css";
+import { Button } from "./UI/button";
 
 const PomodoroTimer: Component<ParentProps> = (props) => {
   const [
@@ -80,39 +87,50 @@ const PomodoroTimer: Component<ParentProps> = (props) => {
     }
   };
 
-  // TODO : see if can be optimize
-  const interval = setInterval(() => {
-    if (state.timerState == "PLAY") {
-      const clone = { ...state, time: { ...state.time } };
-      if (clone.time.seconds - 1 > 0) {
-        clone.time.seconds = clone.time.seconds - 1;
-      } else {
-        clone.time.seconds = clone.time.minutes - 1 >= 0 ? 59 : 0;
+  let interval: number;
 
-        if (clone.time.minutes - 1 < 0) {
-          handleChangePomodoroStatus(
-            pomodoroState() == "Focus" ? "Rest" : "Focus"
-          );
-          clone.time.minutes = timeMap.get(pomodoroState()) as number;
-          clone.timerState = "PAUSE";
-          const audio = new Audio(
-            "https://media.geeksforgeeks.org/wp-content/uploads/20190531135120/beep.mp3"
-          );
-          audio.play();
+  createEffect(() => {
+    interval = setInterval(() => {
+      if (state.timerState == "PLAY") {
+        const clone = { ...state, time: { ...state.time } };
+        if (clone.time.seconds - 1 > 0) {
+          clone.time.seconds = clone.time.seconds - 1;
         } else {
-          clone.time.minutes = clone.time.minutes - 1;
+          clone.time.seconds = clone.time.minutes - 1 >= 0 ? 59 : 0;
+
+          if (clone.time.minutes - 1 < 0) {
+            handleChangePomodoroStatus(
+              pomodoroState() == "Focus" ? "Rest" : "Focus"
+            );
+            clone.time.minutes = timeMap.get(pomodoroState()) as number;
+            clone.timerState = "PAUSE";
+            const audio = new Audio(
+              "https://media.geeksforgeeks.org/wp-content/uploads/20190531135120/beep.mp3"
+            );
+            //audio.play();
+          } else {
+            clone.time.minutes = clone.time.minutes - 1;
+          }
         }
+        setState({ ...clone });
       }
-      setState({ ...clone });
-    }
-  }, 10);
+    }, 10);
+  });
 
   onCleanup(() => clearInterval(interval));
 
   return (
     <div class={styles.Pomodoro}>
-      <h2> pomodoro </h2>
-      <div>
+      <div class={styles.PomodoroFocusManagementWrapper}>
+        <div class={styles.SelectPomodoroFocusTypeButtonsWrapper}>
+          <Button class={styles.SelectPomodoroFocusTypeButton}>Pomodoro</Button>
+          <Button class={styles.SelectPomodoroFocusTypeButton}>
+            Short Break
+          </Button>
+          <Button class={styles.SelectPomodoroFocusTypeButton}>
+            Long Break
+          </Button>
+        </div>
         <div class={styles.Timer}>
           <Show
             when={state.time.minutes > 9}
@@ -128,13 +146,11 @@ const PomodoroTimer: Component<ParentProps> = (props) => {
             {state.time.seconds}
           </Show>
         </div>
-        <div class={styles.TimerActions}>
-          <button class={styles.TimerActionButton} onClick={handleRun}>
-            <Show when={state.timerState === "PAUSE"} fallback={"⏹"}>
-              ▶
-            </Show>
-          </button>
-        </div>
+        <Button class={styles.TimerActionButton} onClick={handleRun}>
+          <Show when={state.timerState === "PAUSE"} fallback={"STOP"}>
+            START
+          </Show>
+        </Button>
       </div>
       {props.children}
     </div>
