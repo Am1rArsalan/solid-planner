@@ -12,21 +12,12 @@ type Props = ParentProps<
 >;
 
 export const PomodoroItem: Component<Props> = (props) => {
-  const { _id, title, children, handleActive, activePomodoro, done } = props;
+  const { title, children, handleActive, done } = props;
 
   return (
     <div
       class={
-        activePomodoro()?._id === _id
-          ? !done
-            ? classNames(styles.PomodoroItem, "sortable", styles.ActivePomodoro)
-            : classNames(
-                styles.Done,
-                styles.PomodoroItem,
-                "sortable",
-                styles.ActivePomodoro
-              )
-          : !done
+        !done
           ? classNames(styles.PomodoroItem, "sortable")
           : classNames(styles.Done, styles.PomodoroItem, "sortable")
       }
@@ -46,17 +37,9 @@ export const SortablePomodoroItem: Component<Props> = (props) => {
   return (
     <div
       use:sortable
+      aria-label={`${activePomodoro()?._id === _id}`}
       class={
-        activePomodoro()?._id === _id
-          ? !done
-            ? classNames(styles.PomodoroItem, "sortable", styles.ActivePomodoro)
-            : classNames(
-                styles.Done,
-                styles.PomodoroItem,
-                "sortable",
-                styles.ActivePomodoro
-              )
-          : !done
+        !done
           ? classNames(styles.PomodoroItem, "sortable")
           : classNames(styles.Done, styles.PomodoroItem, "sortable")
       }
