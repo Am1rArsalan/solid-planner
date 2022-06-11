@@ -1,12 +1,18 @@
 .Backlogs {
   padding: 1rem;
-  /* FIXME : temp */
   width: 40rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem;
+  padding: 2rem 1rem 1rem 1rem;
   gap: 1rem;
+}
+
+.BacklogsHeader {
+  margin: 0;
+  color: white;
+  font-size: 2.2rem;
+  font-weight: bold;
 }
 
 .OpenFormButton {

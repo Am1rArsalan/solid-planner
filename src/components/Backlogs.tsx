@@ -139,7 +139,7 @@ const BacklogsContainer: Component<ParentProps> = (props) => {
 
   return (
     <div class={styles.Backlogs}>
-      <h2> Backlogs</h2>
+      <h2 class={styles.BacklogsHeader}> Backlogs </h2>
       <Show
         when={showForm()}
         fallback={
