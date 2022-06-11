@@ -6,12 +6,9 @@ import {
   ParentProps,
   Show,
 } from "solid-js";
-import {
-  PomodoroContainer,
-  PomodoroItemContainer,
-  SortablePomodoroItem,
-} from "./Pomodoro";
-import PomodoroItemConfigForm from "./PomodoroItemConfigForm";
+import { PomodoroItem, SortablePomodoroItem } from "./PomodoroItem";
+import PomodoroTimer from "./PomodoroTimer";
+import PomodoroEditForm from "./PomodoroEditForm";
 import { PomodoroType } from "../types/pomodoro";
 import {
   DragDropProvider,
@@ -21,15 +18,20 @@ import {
   closestCenter,
 } from "@thisbeyond/solid-dnd";
 import { useStore } from "../store";
+import { IconButton } from "./UI/button";
+import { Close } from "./UI/icons/Close";
+import { ArrowDown } from "./UI/icons/ArrowDown";
+import { ArrowLeft } from "./UI/icons/ArrowLeft";
+import { ArrowUp } from "./UI/icons/ArrowUp";
+import { Check } from "./UI/icons/Check";
 
 type Props = {
   move: (id: string, currentStatus: "Backlog" | "Pomodoro") => void;
 };
 
 const Pomodoros: Component<Props> = ({ move }) => {
-  const [showDetail, setShowDetail] = createSignal("");
+  const [showEdit, setShowForm] = createSignal("");
   const [activeDrag, setActiveDrag] = createSignal(null);
-
   const [
     { pomodoros, activePomodoro },
     {
@@ -37,7 +39,7 @@ const Pomodoros: Component<Props> = ({ move }) => {
       clientRemoveRevalidate,
       clientRemove,
       mutatePomodoros,
-      changeOrder,
+      changePomodorosOrder,
       clientFilterDoneTask,
       clientFilterDoneTaskRevalidate,
       changeActivePomodoro,
@@ -87,11 +89,9 @@ const Pomodoros: Component<Props> = ({ move }) => {
       if (fromIndex !== toIndex) {
         let updatedItems = currentItems.slice();
         updatedItems.splice(toIndex, 0, ...updatedItems.splice(fromIndex, 1));
-
         mutatePomodoros(updatedItems);
-
         try {
-          await changeOrder({
+          await changePomodorosOrder({
             orders: updatedItems.map((item, order) => ({
               ...item,
               order: order + 1,
@@ -108,8 +108,7 @@ const Pomodoros: Component<Props> = ({ move }) => {
 
   const handleActive = async (id: string) => {
     if (id === activePomodoro()?._id) return;
-    ///  FIXME
-    const activeItem = pomodoros()?.find((item) => item._id == id);
+    const activeItem = pomodoros().find((item) => item._id == id);
     changeActivePomodoro(activeItem ? activeItem : null);
   };
 
@@ -122,8 +121,9 @@ const Pomodoros: Component<Props> = ({ move }) => {
     }
   };
 
+  // FIXME : resolve solid dnd TS errors
   return (
-    <PomodoroContainer>
+    <PomodoroTimer>
       <div style={{ height: "3rem", width: "100%", padding: "1rem" }}>
         {pomodoros.loading && "loading..."}
       </div>
@@ -139,93 +139,94 @@ const Pomodoros: Component<Props> = ({ move }) => {
           <For each={pomodoros()}>
             {(item) => (
               <>
-                <SortablePomodoroItem
-                  activePomodoro={activePomodoro}
-                  handleActive={() => handleActive(item._id)}
-                  {...item}
+                <Show
+                  when={showEdit() !== item._id}
+                  fallback={
+                    <SlideIn showEdit={showEdit} id={item._id}>
+                      <PomodoroEditForm
+                        current={item.current}
+                        end={item.end}
+                        id={item._id}
+                        handleClose={() => setShowForm("")}
+                        title={item.title}
+                      />
+                    </SlideIn>
+                  }
                 >
-                  <button
-                    disabled={activePomodoro()?._id == item._id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      move(item._id, "Pomodoro");
-                    }}
+                  <SortablePomodoroItem
+                    activePomodoro={activePomodoro}
+                    handleActive={() => handleActive(item._id)}
+                    {...item}
                   >
-                    {"⬅"}
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      item._id === showDetail()
-                        ? setShowDetail("")
-                        : setShowDetail(item._id);
-                    }}
-                  >
-                    {item._id !== showDetail() ? "⬇" : "⬆"}
-                  </button>
-                  <button
-                    onClick={(ev) => {
-                      makeTaskDone(item._id);
-                      ev.stopPropagation();
-                    }}
-                  >
-                    {"✔"}
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemovePomodoro(item._id);
-                    }}
-                  >
-                    {"X"}
-                  </button>
-                </SortablePomodoroItem>
-                <SlideIn showDetail={showDetail} id={item._id}>
-                  <Show when={showDetail() === item._id}>
-                    <PomodoroItemConfigForm
-                      current={item.current}
-                      end={item.end}
-                      id={item._id}
+                    <IconButton
+                      disabled={activePomodoro()?._id == item._id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        move(item._id, "Pomodoro");
+                      }}
                     >
-                      <div>
-                        <button onClick={() => setShowDetail("")}>
-                          cancel
-                        </button>
-                        <button form="pomodoro-config" type="submit">
-                          save
-                        </button>
-                      </div>
-                    </PomodoroItemConfigForm>
-                  </Show>
-                </SlideIn>
+                      <ArrowLeft width={16} height={16} fill="#000" />
+                    </IconButton>
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        item._id === showEdit()
+                          ? setShowForm("")
+                          : setShowForm(item._id);
+                      }}
+                    >
+                      {item._id !== showEdit() ? (
+                        <ArrowDown width={16} height={16} fill="#000" />
+                      ) : (
+                        <ArrowUp width={16} height={16} fill="#000" />
+                      )}
+                    </IconButton>
+                    <IconButton
+                      onClick={(ev) => {
+                        makeTaskDone(item._id);
+                        ev.stopPropagation();
+                      }}
+                    >
+                      <Check width={16} height={16} fill="#000" />
+                    </IconButton>
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemovePomodoro(item._id);
+                      }}
+                    >
+                      <Close width={18} height={18} fill="#000" />
+                    </IconButton>
+                  </SortablePomodoroItem>
+                </Show>
               </>
             )}
           </For>
         </SortableProvider>
         <DragOverlay>
-          <PomodoroItemContainer
+          <PomodoroItem
             activePomodoro={activeDrag}
             draggableId={"pomodoros-dnd"}
           >
             heyyyy
-          </PomodoroItemContainer>
+          </PomodoroItem>
         </DragOverlay>
       </DragDropProvider>
-    </PomodoroContainer>
+    </PomodoroTimer>
   );
 };
 
-type SlideInProps = ParentProps<{ showDetail: Accessor<string>; id: string }>;
+type SlideInProps = ParentProps<{ showEdit: Accessor<string>; id: string }>;
 
-const SlideIn: Component<SlideInProps> = ({ children, showDetail, id }) => {
+const SlideIn: Component<SlideInProps> = ({ children, showEdit, id }) => {
   return (
     <div
       style={{
+        width: showEdit() !== id ? 0 : "100%",
+        height: showEdit() !== id ? 0 : "10rem",
         display: "flex",
         "justify-content": "space-between",
         "flex-direction": "column",
-        height: showDetail() !== id ? 0 : "10rem",
-        width: showDetail() !== id ? 0 : "100%",
         transition: "all  40ms ease-out",
       }}
     >

@@ -1,5 +1,4 @@
-import { createSortable } from "@thisbeyond/solid-dnd";
-import { Accessor, Component, onCleanup, Show, ParentProps } from "solid-js";
+import { Component, onCleanup, ParentProps, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import { timeMap } from "../constants/pomodoro";
 import { useStore } from "../store";
@@ -8,9 +7,9 @@ import {
   PomodoroTimerState,
   PomodoroType,
 } from "../types/pomodoro";
-import styles from "./Pomodoro.module.css";
+import styles from "./PomodoroTimer.module.css";
 
-export const PomodoroContainer: Component<ParentProps> = ({ children }) => {
+const PomodoroTimer: Component<ParentProps> = (props) => {
   const [
     { pomodoroState, activePomodoro },
     { editPomodoro, changePomodoroStatus, cycleFocus, loadPomodoros },
@@ -113,7 +112,7 @@ export const PomodoroContainer: Component<ParentProps> = ({ children }) => {
   return (
     <div class={styles.Pomodoro}>
       <h2> pomodoro </h2>
-      <div class={styles.PomodoroTimer}>
+      <div>
         <div class={styles.Timer}>
           <Show
             when={state.time.minutes > 9}
@@ -137,81 +136,9 @@ export const PomodoroContainer: Component<ParentProps> = ({ children }) => {
           </button>
         </div>
       </div>
-      {children}
+      {props.children}
     </div>
   );
 };
 
-type PomodoroItemProps = ParentProps<
-  PomodoroType & {
-    handleActive: () => void;
-    activePomodoro: Accessor<PomodoroType | null>;
-  }
->;
-
-export const PomodoroItemContainer: Component<PomodoroItemProps> = ({
-  _id,
-  title,
-  children,
-  handleActive,
-  activePomodoro,
-  done,
-}) => {
-  return (
-    <div
-      class={
-        activePomodoro()?._id == _id
-          ? !done
-            ? [styles.PomodoroItem, "sortable", styles.ActivePomodoro].join(" ")
-            : [
-                styles.Done,
-                styles.PomodoroItem,
-                "sortable",
-                styles.ActivePomodoro,
-              ].join(" ")
-          : !done
-          ? [styles.PomodoroItem, "sortable"].join(" ")
-          : [styles.Done, styles.PomodoroItem, "sortable"].join(" ")
-      }
-      onClick={handleActive}
-    >
-      <div class={styles.PomodoroTitle}>{title}</div>
-      <div class={styles.PomodoroItemAction}>{children} </div>
-    </div>
-  );
-};
-
-export const SortablePomodoroItem: Component<PomodoroItemProps> = ({
-  _id,
-  title,
-  children,
-  handleActive,
-  activePomodoro,
-  done,
-  order,
-}) => {
-  const sortable = createSortable(`${_id}-${order}`);
-  return (
-    <div
-      use:sortable
-      class={
-        activePomodoro()?._id == _id
-          ? !done
-            ? [styles.PomodoroItem, "sortable", styles.ActivePomodoro].join(" ")
-            : [
-                styles.Done,
-                styles.PomodoroItem,
-                "sortable",
-                styles.ActivePomodoro,
-              ].join(" ")
-          : !done
-          ? [styles.PomodoroItem, "sortable"].join(" ")
-          : [styles.Done, styles.PomodoroItem, "sortable"].join(" ")
-      }
-      onClick={handleActive}
-    >
-      <div class={styles.PomodoroTitle}>{title}</div>
-      <div class={styles.PomodoroItemAction}>{children}</div>
-    </div>
-  );
-};
+export default PomodoroTimer;
