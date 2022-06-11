@@ -2,15 +2,13 @@ import { Component, ParentProps } from "solid-js";
 import { createStore } from "solid-js/store";
 import { useStore } from "../store";
 
-const API_ROOT = "http://localhost:8000";
-
-type PomodoroItemConfigFormProps = ParentProps<{
+type Props = ParentProps<{
   current: number;
   end: number;
   id: string;
 }>;
 
-const PomodoroItemConfigForm: Component<PomodoroItemConfigFormProps> = ({
+const PomodoroItemConfigForm: Component<Props> = ({
   current,
   end,
   children,
@@ -24,6 +22,21 @@ const PomodoroItemConfigForm: Component<PomodoroItemConfigFormProps> = ({
     active: "act" | "est";
   }>({ active: "est", act: current, est: end });
 
+  const handleSubmit = async (
+    e: Event & { submitter: HTMLElement } & {
+      currentTarget: HTMLFormElement;
+      target: Element;
+    }
+  ) => {
+    e.preventDefault();
+    try {
+      await editPomodoro(id, state.est, state.act);
+      loadPomodoros();
+    } catch (error) {
+      // TODO : handle error
+    }
+  };
+
   return (
     <>
       <form
@@ -33,16 +46,7 @@ const PomodoroItemConfigForm: Component<PomodoroItemConfigFormProps> = ({
           "justify-content": "space-between",
           width: "100%",
         }}
-        onSubmit={async (e) => {
-          e.preventDefault();
-
-          try {
-            await editPomodoro(id, state.est, state.act);
-            loadPomodoros();
-          } catch (error) {
-            // TODO : handle error
-          }
-        }}
+        onSubmit={handleSubmit}
       >
         <div>
           <span
