@@ -12,6 +12,7 @@ import createPomodoro, { PomodoroActions } from "./createPomodoro";
 import createPomodoros, { PomodorosActions } from "./createPomodoros";
 
 // I don't like this
+//export type Actions = BacklogActions & PomodoroActions & PomodorosActions;
 export interface Actions
   extends BacklogActions,
     PomodoroActions,
@@ -61,8 +62,8 @@ export const Provider: Component<ParentProps> = (props) => {
 };
 
 export function useStore() {
-  const store = useContext<StoreContextType>(StoreContext);
-  return store;
+  const store = useContext(StoreContext);
+  return store as StoreContextType;
 }
 
 export function useRouter() {
