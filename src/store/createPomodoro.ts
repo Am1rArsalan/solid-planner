@@ -6,7 +6,12 @@ import { editPomodoro } from "../api/pomodoro";
 
 export interface PomodoroActions {
   changePomodoroStatus(value: PomodoroFocusType): void;
-  editPomodoro(id: string, end: number, act: number, title?: string): void;
+  editPomodoro(
+    id: string,
+    end: number,
+    act: number,
+    title?: string
+  ): Promise<PomodoroType>;
   changeActivePomodoro(activeItem: PomodoroType | null): void;
   cycleFocus(): void;
 }
