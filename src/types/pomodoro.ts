@@ -11,9 +11,9 @@ export type TaskBaseType = {
   updated_at: string;
 };
 
-export type TaskType = TaskBaseType & { status: TaskStatusType };
 export type BacklogType = TaskBaseType & { status: "Backlog" };
 export type PomodoroType = TaskBaseType & { status: "Pomodoro" };
+export type TaskType = BacklogType | PomodoroType;
 
 export type PomodoroFocusType = "Focus" | "Rest";
 export type PomodoroTimerState = "PLAY" | "PAUSE";
@@ -21,11 +21,13 @@ export type PomodoroTimerState = "PLAY" | "PAUSE";
 export type CreateDto = {
   title: string;
   order: number;
+  end: number;
 };
 
 export type CreatePendingItemDto = {
   title: string;
   creationTime: string;
+  est: number;
 };
 
 export type EditPomodoroDto = {
