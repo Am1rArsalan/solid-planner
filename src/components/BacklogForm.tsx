@@ -6,7 +6,7 @@ import { Button, IconButton } from "./UI/button";
 import { ArrowDown } from "./UI/icons/ArrowDown";
 import { ArrowUp } from "./UI/icons/ArrowUp";
 
-const AddBacklogForm: Component<{ handleClose: () => void }> = ({
+const BacklogForm: Component<{ handleClose: () => void }> = ({
   handleClose,
 }) => {
   const [
@@ -62,7 +62,7 @@ const AddBacklogForm: Component<{ handleClose: () => void }> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} class={styles.AddForm}>
+    <form onSubmit={handleSubmit} class={styles.Form}>
       <div class={styles.FormBody}>
         <div class={styles.FormController}>
           <input
@@ -118,4 +118,4 @@ const AddBacklogForm: Component<{ handleClose: () => void }> = ({
   );
 };
 
-export default AddBacklogForm;
+export default BacklogForm;
