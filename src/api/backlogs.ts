@@ -1,4 +1,4 @@
-import { BacklogType, CreateDto, PomodoroType } from "../types/pomodoro";
+import { BacklogType, CreateDto } from "../types/pomodoro";
 import { createFetchHttpRequest, createHttpRequest } from "./createHttpRequest";
 
 export async function fetchBacklogs(
@@ -17,7 +17,7 @@ export async function fetchBacklogs(
 export async function addBacklog(
   data: CreateDto,
   token: string | null
-): Promise<BacklogType[]> {
+): Promise<BacklogType> {
   try {
     const result = await createHttpRequest<CreateDto>(
       "POST",
