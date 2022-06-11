@@ -8,19 +8,17 @@ import {
   PomodoroType,
 } from "../types/pomodoro";
 import { fetchBacklogs, addBacklog } from "../api/backlogs";
-import { changeOrder, removePomodoro } from "../api/shared";
-import { ChangeOrderDto } from "../types/shared";
+import { removePomodoro } from "../api/shared";
 import { Actions } from ".";
 
 export interface BacklogActions {
   loadBacklogs(): BacklogType[] | Promise<BacklogType[]> | undefined | null;
   mutateBacklogs(data: BacklogType[]): BacklogType[];
-  addBacklog(data: CreateDto): Promise<BacklogType[]>;
+  addBacklog(data: CreateDto): Promise<BacklogType>;
   addPendingItem(data: CreatePendingItemDto): void;
   removePendingItem(creationTime: string): void;
   revalidateAddedItem(addedTask: BacklogType, creationTime: string): void;
   removeBacklog(id: string): Promise<BacklogType>;
-  changeOrder(data: ChangeOrderDto): Promise<BacklogType[]>;
   moveBacklogItemAndReOrder(id: string): void;
   addMovedPomodoroItem(movedItem: PomodoroType): void;
 }
@@ -29,7 +27,6 @@ export default function createBacklogs(
   actions: Actions,
   state: StoreType
 ): Resource<BacklogType[]> {
-  console.log("start of create backlog");
   const [backlogs, { mutate, refetch }] = createResource<BacklogType[]>(
     async () => await fetchBacklogs(state.token),
     {
@@ -53,7 +50,7 @@ export default function createBacklogs(
         {
           current: 0,
           done: false,
-          end: 0,
+          end: data.est,
           isRemoved: false,
           status: "Backlog",
           title: data.title,
@@ -79,9 +76,6 @@ export default function createBacklogs(
     },
     removeBacklog(id: string) {
       return removePomodoro<BacklogType>(id, state.token);
-    },
-    changeOrder(data: ChangeOrderDto) {
-      return changeOrder<BacklogType>(data, state.token);
     },
     moveBacklogItemAndReOrder(id: string) {
       mutate((prev) => {
