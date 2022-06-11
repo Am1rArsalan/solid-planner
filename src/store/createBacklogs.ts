@@ -8,7 +8,8 @@ import {
   PomodoroType,
 } from "../types/pomodoro";
 import { fetchBacklogs, addBacklog } from "../api/backlogs";
-import { removePomodoro } from "../api/shared";
+import { changeOrder, removePomodoro } from "../api/shared";
+import { ChangeOrderDto } from "../types/shared";
 import { Actions } from ".";
 
 export interface BacklogActions {
@@ -19,6 +20,7 @@ export interface BacklogActions {
   removePendingItem(creationTime: string): void;
   revalidateAddedItem(addedTask: BacklogType, creationTime: string): void;
   removeBacklog(id: string): Promise<BacklogType>;
+  changeBacklogsOrder(data: ChangeOrderDto): Promise<BacklogType[]>;
   moveBacklogItemAndReOrder(id: string): void;
   addMovedPomodoroItem(movedItem: PomodoroType): void;
 }
@@ -76,6 +78,9 @@ export default function createBacklogs(
     },
     removeBacklog(id: string) {
       return removePomodoro<BacklogType>(id, state.token);
+    },
+    changeBacklogsOrder(data: ChangeOrderDto) {
+      return changeOrder<BacklogType>(data, state.token);
     },
     moveBacklogItemAndReOrder(id: string) {
       mutate((prev) => {

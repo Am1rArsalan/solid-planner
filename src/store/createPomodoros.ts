@@ -13,7 +13,6 @@ export interface PomodorosActions {
   remove(id: string): Promise<PomodoroType>;
   clientRemove(id: string): void;
   clientRemoveRevalidate(removedItem: PomodoroType): void;
-  changeOrder(data: ChangeOrderDto): Promise<PomodoroType[]>;
   makeTaskDone(id: string): Promise<PomodoroType[]>;
   clientFilterDoneTask(id: string): void;
   clientFilterDoneTaskRevalidate(id: string): void;
@@ -23,6 +22,7 @@ export interface PomodorosActions {
     id: string,
     data: ChangeTaskStatusDto
   ): Promise<PomodoroType[]>;
+  changePomodorosOrder(data: ChangeOrderDto): Promise<PomodoroType[]>;
 }
 
 export default function createPomodoros({
@@ -40,6 +40,9 @@ export default function createPomodoros({
   );
 
   Object.assign<Actions, PomodorosActions>(actions, {
+    changePomodorosOrder(data: ChangeOrderDto) {
+      return changeOrder<PomodoroType>(data, state.token);
+    },
     loadPomodoros() {
       return refetch();
     },
@@ -61,9 +64,6 @@ export default function createPomodoros({
       mutate((prev) => {
         return [...prev, removedItem];
       });
-    },
-    changeOrder(data: ChangeOrderDto) {
-      return changeOrder<PomodoroType>(data, state.token);
     },
     makeTaskDone(id: string) {
       return makeTaskDone(id, state.token);
