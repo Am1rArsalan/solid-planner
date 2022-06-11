@@ -22,9 +22,11 @@ import {
 } from "@thisbeyond/solid-dnd";
 import { useStore } from "../store";
 
-const Pomodoros: Component<{
+type Props = {
   move: (id: string, currentStatus: "Backlog" | "Pomodoro") => void;
-}> = ({ move }) => {
+};
+
+const Pomodoros: Component<Props> = ({ move }) => {
   const [showDetail, setShowDetail] = createSignal("");
   const [activeDrag, setActiveDrag] = createSignal(null);
 
@@ -64,6 +66,7 @@ const Pomodoros: Component<{
     }
   };
 
+  // FIX : ts error ( dnd )
   const onDragEnd = async ({ draggable, droppable }) => {
     if (draggable && droppable) {
       const currentItems = pomodoros();
@@ -105,7 +108,9 @@ const Pomodoros: Component<{
 
   const handleActive = async (id: string) => {
     if (id === activePomodoro()?._id) return;
-    changeActivePomodoro(pomodoros()?.find((item) => item._id == id));
+    ///  FIXME
+    const activeItem = pomodoros()?.find((item) => item._id == id);
+    changeActivePomodoro(activeItem ? activeItem : null);
   };
 
   const makeTaskDone = async (id: string) => {
@@ -124,7 +129,6 @@ const Pomodoros: Component<{
       </div>
       <DragDropProvider
         onDragStart={({ draggable }) => {
-          console.log("drag start");
           setActiveDrag(draggable);
         }}
         onDragEnd={onDragEnd}
