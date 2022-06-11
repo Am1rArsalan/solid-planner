@@ -3,7 +3,7 @@ import styles from "./App.module.css";
 import Backlogs from "./components/Backlogs";
 import Pomodoros from "./components/Pomodoros";
 import { useStore } from "./store";
-import { TaskType } from "./types/pomodoro";
+import { BacklogType, PomodoroType, TaskType } from "./types/pomodoro";
 
 const App: Component = () => {
   const [
@@ -17,6 +17,7 @@ const App: Component = () => {
     },
   ] = useStore();
 
+  // move this to store ...
   const handleMove = async (
     id: string,
     currentStatus: "Backlog" | "Pomodoro"
@@ -45,11 +46,12 @@ const App: Component = () => {
         currentOrders: currentStatus == "Backlog" ? backlogs() : pomodoros(),
       });
     } catch (error) {
+      // TODO : don't use "as" for type safety
       if (currentStatus === "Pomodoro") {
-        addMovedBacklogItem(removedItem);
+        addMovedBacklogItem(removedItem as BacklogType);
         moveBacklogItemAndReOrder(id);
       } else {
-        addMovedPomodoroItem(removedItem);
+        addMovedPomodoroItem(removedItem as PomodoroType);
         moveItemAndOrderItems(id);
       }
     }
