@@ -9,7 +9,6 @@
   font-size: 14px;
   padding: 0.8rem 1.2rem;
   min-width: 70px;
-  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -30,6 +29,10 @@
   min-width: 0px;
   font-size: 1.4rem;
   background-color: #fff;
+}
+
+.IconButton:disabled {
+  opacity: 0.3;
 }
 
 .IconButton:active {

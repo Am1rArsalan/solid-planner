@@ -9,6 +9,7 @@ export const IconButton: Component<IconButtonProps> = (props) => {
   const { children } = props;
 
   const propsWithDefault: IconButtonProps<"button"> = mergeProps(props);
+
   const [local, _, others] = splitProps(
     propsWithDefault,
     ["class", "disabled"],
@@ -20,7 +21,7 @@ export const IconButton: Component<IconButtonProps> = (props) => {
   };
 
   return (
-    <button class={classes()} {...others}>
+    <button class={classes()} disabled={local.disabled} {...others}>
       {children}
     </button>
   );

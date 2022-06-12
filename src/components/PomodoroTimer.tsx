@@ -97,7 +97,6 @@ const PomodoroTimer: Component<ParentProps> = (props) => {
           clone.time.seconds = clone.time.seconds - 1;
         } else {
           clone.time.seconds = clone.time.minutes - 1 >= 0 ? 59 : 0;
-
           if (clone.time.minutes - 1 < 0) {
             handleChangePomodoroStatus(
               pomodoroState() == "Focus" ? "Rest" : "Focus"
@@ -107,7 +106,7 @@ const PomodoroTimer: Component<ParentProps> = (props) => {
             const audio = new Audio(
               "https://media.geeksforgeeks.org/wp-content/uploads/20190531135120/beep.mp3"
             );
-            //audio.play();
+            audio.play();
           } else {
             clone.time.minutes = clone.time.minutes - 1;
           }
@@ -141,9 +140,6 @@ const PomodoroTimer: Component<ParentProps> = (props) => {
           >
             Short Break
           </Button>
-          {/*<Button class={styles.SelectPomodoroFocusTypeButton}>
-            Long Break
-          </Button> */}
         </div>
         <div class={styles.Timer}>
           <Show
