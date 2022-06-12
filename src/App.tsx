@@ -2,6 +2,7 @@ import { Component } from "solid-js";
 import styles from "./App.module.css";
 import Backlogs from "./components/Backlogs";
 import Pomodoros from "./components/Pomodoros";
+import { Button } from "./components/UI/button";
 import { classNames } from "./components/UI/utils/classNames";
 import { useStore } from "./store";
 import { BacklogType, PomodoroType, TaskType } from "./types/pomodoro";
@@ -18,7 +19,6 @@ const App: Component = () => {
     },
   ] = useStore();
 
-  // move this to store ...
   const handleMove = async (
     id: string,
     currentStatus: "Backlog" | "Pomodoro"
@@ -47,7 +47,6 @@ const App: Component = () => {
         currentOrders: currentStatus == "Backlog" ? backlogs() : pomodoros(),
       });
     } catch (error) {
-      // TODO : don't use "as" for type safety
       if (currentStatus === "Pomodoro") {
         addMovedBacklogItem(removedItem as BacklogType);
         moveBacklogItemAndReOrder(id);
@@ -60,6 +59,9 @@ const App: Component = () => {
 
   return (
     <div class={styles.App}>
+      <a href="http://localhost:8080/auth/google">
+        <Button class={styles.SignInButton}> Sign In</Button>
+      </a>
       <Backlogs move={handleMove} />
       <Pomodoros move={handleMove} />
       <div
