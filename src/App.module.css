@@ -8,6 +8,13 @@
   padding: 4rem 0;
 }
 
+@media (max-width: 1200px) {
+  .App {
+    flex-direction: column-reverse;
+    align-items: center;
+  }
+}
+
 .Background {
   position: fixed;
   top: 0;
@@ -20,4 +27,22 @@
 
 .BlueBackground {
   background-color: rgb(76, 145, 149);
+}
+
+.SignInButton {
+  text-align: center;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.9;
+  background: none rgba(255, 255, 255, 0.2);
+  box-shadow: none;
+  margin-left: 10px;
+  font-size: 13px;
+  padding: 8px 12px;
+  min-width: 70px;
+  border: none;
+  color: white !important;
+  position: fixed;
+  top: 0;
+  left: 0;
 }
