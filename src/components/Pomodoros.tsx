@@ -218,12 +218,13 @@ const Pomodoros: Component<Props> = ({ move }) => {
 
 type SlideInProps = ParentProps<{ showEdit: Accessor<string>; id: string }>;
 
+// FIX: slide in does not work
 const SlideIn: Component<SlideInProps> = ({ children, showEdit, id }) => {
   return (
     <div
       style={{
         width: showEdit() !== id ? 0 : "100%",
-        height: showEdit() !== id ? 0 : "10rem",
+        "max-height": showEdit() !== id ? 0 : "30rem",
         display: "flex",
         "justify-content": "space-between",
         "flex-direction": "column",
