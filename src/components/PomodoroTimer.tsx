@@ -44,6 +44,16 @@ const PomodoroTimer: Component<ParentProps> = (props) => {
     },
   });
 
+  const resetTimerState = () => {
+    setState({
+      timerState: "PAUSE",
+      time: {
+        minutes: timeMap.get(pomodoroState()) as number,
+        seconds: 0,
+      },
+    });
+  };
+
   const handleRun = () => {
     if (activePomodoro()) {
       setState({
@@ -125,18 +135,24 @@ const PomodoroTimer: Component<ParentProps> = (props) => {
           <Button
             aria-label={`${pomodoroState() === "Focus"}`}
             class={styles.SelectPomodoroFocusTypeButton}
-            onClick={() =>
-              pomodoroState() !== "Focus" && changePomodoroStatus("Focus")
-            }
+            onClick={() => {
+              if (pomodoroState() !== "Focus") {
+                changePomodoroStatus("Focus");
+                resetTimerState();
+              }
+            }}
           >
             Pomodoro
           </Button>
           <Button
             aria-label={`${pomodoroState() === "Rest"}`}
             class={styles.SelectPomodoroFocusTypeButton}
-            onClick={() =>
-              pomodoroState() !== "Rest" && changePomodoroStatus("Rest")
-            }
+            onClick={() => {
+              if (pomodoroState() !== "Rest") {
+                changePomodoroStatus("Rest");
+                resetTimerState();
+              }
+            }}
           >
             Short Break
           </Button>
