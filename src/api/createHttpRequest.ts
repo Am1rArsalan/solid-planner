@@ -11,7 +11,7 @@ export async function createFetchHttpRequest(
   const headers: any = {};
   const opts: any = { method, headers };
 
-  if (token) headers["Authorization"] = `Token ${token}`;
+  if (token) headers["Authorization"] = `${token}`;
 
   try {
     const response = await fetch(API_ROOT + url, opts);
@@ -42,7 +42,7 @@ export async function createHttpRequest<DataType>(
     opts.body = JSON.stringify(data);
   }
 
-  if (token) headers["Authorization"] = `Token ${token}`;
+  if (token) headers["Authorization"] = `${token}`;
 
   try {
     const response = await fetch(API_ROOT + url, opts);

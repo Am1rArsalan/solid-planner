@@ -1,4 +1,5 @@
 import { Component } from "solid-js";
+import { useNavigate } from "solid-app-router";
 import styles from "./App.module.css";
 import Backlogs from "./components/Backlogs";
 import Pomodoros from "./components/Pomodoros";
@@ -8,9 +9,11 @@ import { useStore } from "./store";
 import { BacklogType, PomodoroType, TaskType } from "./types/pomodoro";
 
 const App: Component = () => {
+  const nav = useNavigate();
   const [
     { pomodoroState, pomodoros, backlogs },
     {
+      logout,
       moveItemAndOrderItems,
       addMovedPomodoroItem,
       addMovedBacklogItem,
@@ -59,9 +62,15 @@ const App: Component = () => {
 
   return (
     <div class={styles.App}>
-      <a href="http://localhost:8080/auth/google">
-        <Button class={styles.SignInButton}> Sign In</Button>
-      </a>
+      <Button
+        class={styles.SignInButton}
+        onClick={async () => {
+          await logout();
+          nav("/auth");
+        }}
+      >
+        logout
+      </Button>
       <Backlogs move={handleMove} />
       <Pomodoros move={handleMove} />
       <div
