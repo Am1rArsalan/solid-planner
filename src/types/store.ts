@@ -1,5 +1,6 @@
 import { Accessor, Resource } from "solid-js";
 import { BacklogType, PomodoroFocusType, PomodoroType } from "./pomodoro";
+import { UserType } from "./user";
 
 export type StoreType = {
   readonly token: string | null;
@@ -7,4 +8,5 @@ export type StoreType = {
   readonly pomodoros: Resource<PomodoroType[]>;
   readonly pomodoroState: Accessor<PomodoroFocusType>;
   readonly activePomodoro: Accessor<PomodoroType | null>;
+  readonly user: Resource<UserType | null>;
 };
