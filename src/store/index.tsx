@@ -32,6 +32,13 @@ export const Provider: Component<ParentProps> = (props) => {
   let activePomodoro: Accessor<PomodoroType | null>;
   let user: Resource<UserType | undefined>;
 
+  const queryParams = new URLSearchParams(location.search);
+  if (!localStorage.getItem("token") && queryParams.get("token")) {
+    localStorage.setItem("token", queryParams.get("token") as string);
+    const newUrl = `${window.location.pathname}`;
+    history.pushState({ path: newUrl }, "", newUrl);
+  }
+
   const [state] = createStore<StoreType>({
     token: localStorage.getItem("token"),
     get backlogs() {
@@ -55,7 +62,7 @@ export const Provider: Component<ParentProps> = (props) => {
   const store: StoreContextType = [state, actions];
   const agent = createAgent(store);
 
-  createSharedActions(actions, state);
+  createSharedActions(actions, state, agent.pomodoros);
   backlogs = createBacklogs(actions, agent);
   user = createUser(actions, agent.user);
   pomodoros = createPomodoros(actions, state, agent);
