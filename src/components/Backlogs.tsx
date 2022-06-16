@@ -79,7 +79,7 @@ const Backlogs: Component<Props> = (props) => {
     setActiveItem(null);
   };
 
-  // FIX : ts error on DragDropProvider
+  // FIXME : ts error on DragDropProvider
   return (
     <DragDropProvider
       onDragStart={({ draggable }) => {
