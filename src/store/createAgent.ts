@@ -69,14 +69,15 @@ export default function createAgent([state, actions]: StoreContextType): Agent {
   };
 
   const backlogs: BacklogsAgent = {
-    fetchBacklogs: () =>
-      createFetchHttpRequest(
+    fetchBacklogs: () => {
+      return createFetchHttpRequest(
         "GET",
         "/pomodoros/backlogs",
         "data",
         state.token,
         actions.logout
-      ),
+      );
+    },
 
     addBacklog: (data: CreateDto) =>
       createHttpRequest<CreateDto>(
@@ -91,19 +92,45 @@ export default function createAgent([state, actions]: StoreContextType): Agent {
 
   const pomodoro = {
     editPomodoro: (data: EditPomodoroDto) =>
-      createHttpRequest("PUT", `/pomodoros/edit`, data, "data", state.token),
+      createHttpRequest(
+        "PUT",
+        `/pomodoros/edit`,
+        data,
+        "data",
+        state.token,
+        actions.logout
+      ),
   };
 
   const pomodoros: PomodorosAgent = {
     fetchPomodoros: () =>
-      createFetchHttpRequest("GET", "/pomodoros", "data", state.token),
+      createFetchHttpRequest(
+        "GET",
+        "/pomodoros",
+        "data",
+        state.token,
+        actions.logout
+      ),
     doneTask: (id: string) =>
-      createFetchHttpRequest("PUT", `/pomodoros/${id}`, "data", state.token),
+      createFetchHttpRequest(
+        "PUT",
+        `/pomodoros/${id}`,
+        "data",
+        state.token,
+        actions.logout
+      ),
     changeTaskStatus: (
       id: string,
       data: ChangeTaskStatusDto
     ): Promise<PomodoroType[]> =>
-      createHttpRequest("POST", `/pomodoros/${id}`, data, "data", state.token),
+      createHttpRequest(
+        "POST",
+        `/pomodoros/${id}`,
+        data,
+        "data",
+        state.token,
+        actions.logout
+      ),
   };
 
   const tasks: TaskAgent = {
@@ -121,7 +148,8 @@ export default function createAgent([state, actions]: StoreContextType): Agent {
         `/pomodoros/order`,
         data,
         "data",
-        state.token
+        state.token,
+        actions.logout
       );
     },
   };
