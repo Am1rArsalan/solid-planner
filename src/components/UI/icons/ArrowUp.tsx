@@ -2,7 +2,7 @@ import { Component } from "solid-js";
 import { IconProps } from "./IconProps";
 
 export const ArrowUp: Component<IconProps> = (props) => {
-  const { width, height, fill, rest } = props;
+  const { width, height, fill, ...rest } = props;
 
   return (
     <svg
