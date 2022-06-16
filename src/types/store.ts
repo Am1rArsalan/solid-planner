@@ -8,5 +8,5 @@ export type StoreType = {
   readonly pomodoros: Resource<PomodoroType[]>;
   readonly pomodoroState: Accessor<PomodoroFocusType>;
   readonly activePomodoro: Accessor<PomodoroType | null>;
-  readonly user: Resource<UserType | null>;
+  readonly user: Resource<UserType | undefined>;
 };
