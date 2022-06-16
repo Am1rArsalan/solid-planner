@@ -8,23 +8,22 @@ import {
 } from "../types/pomodoro";
 import { StoreType } from "../types/store";
 import { UserType } from "../types/user";
+import createAgent from "./createAgent";
 import createBacklogs, { BacklogActions } from "./createBacklogs";
 import createPomodoro, { PomodoroActions } from "./createPomodoro";
 import createPomodoros, { PomodorosActions } from "./createPomodoros";
+import createSharedActions, { SharedActions } from "./createSharedActions";
 import createUser, { UserActions } from "./createUser";
 
-// I don't like this
-//export type Actions = BacklogActions & PomodoroActions & PomodorosActions;
-export interface Actions
-  extends BacklogActions,
-    PomodoroActions,
-    PomodorosActions,
-    UserActions {}
+export type Actions = BacklogActions &
+  PomodoroActions &
+  PomodorosActions &
+  UserActions &
+  SharedActions;
 
-type StoreContextType = [StoreType, Actions];
+export type StoreContextType = [StoreType, Actions];
 
 const StoreContext = createContext<StoreContextType>();
-const RouterContext = createContext();
 
 export const Provider: Component<ParentProps> = (props) => {
   let backlogs: Resource<BacklogType[]>;
@@ -54,11 +53,13 @@ export const Provider: Component<ParentProps> = (props) => {
 
   const actions: Actions = Object({});
   const store: StoreContextType = [state, actions];
+  const agent = createAgent(store);
 
-  backlogs = createBacklogs(actions, state);
-  user = createUser(actions, state);
-  pomodoros = createPomodoros({ actions, state });
-  const singlePomodoro = createPomodoro(actions, state);
+  createSharedActions(actions, state);
+  backlogs = createBacklogs(actions, agent);
+  user = createUser(actions, agent.user);
+  pomodoros = createPomodoros(actions, state, agent);
+  const singlePomodoro = createPomodoro(actions, agent.pomodoro);
   pomodoroState = singlePomodoro.pomodoroState;
   activePomodoro = singlePomodoro.activePomodoro;
 
@@ -72,8 +73,4 @@ export const Provider: Component<ParentProps> = (props) => {
 export function useStore() {
   const store = useContext(StoreContext);
   return store as StoreContextType;
-}
-
-export function useRouter() {
-  return useContext(RouterContext);
 }

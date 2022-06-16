@@ -1,16 +1,14 @@
 import { createResource } from "solid-js";
 import type { Resource } from "solid-js";
-import { StoreType } from "../types/store";
 import {
   BacklogType,
   CreateDto,
   CreatePendingItemDto,
   PomodoroType,
 } from "../types/pomodoro";
-import { fetchBacklogs, addBacklog } from "../api/backlogs";
-import { changeOrder, removePomodoro } from "../api/shared";
 import { ChangeOrderDto } from "../types/shared";
 import { Actions } from ".";
+import { Agent } from "./createAgent";
 
 export interface BacklogActions {
   loadBacklogs(): BacklogType[] | Promise<BacklogType[]> | undefined | null;
@@ -27,10 +25,10 @@ export interface BacklogActions {
 
 export default function createBacklogs(
   actions: Actions,
-  state: StoreType
+  agent: Agent
 ): Resource<BacklogType[]> {
   const [backlogs, { mutate, refetch }] = createResource<BacklogType[]>(
-    async () => await fetchBacklogs(state.token),
+    async () => await agent.backlogs.fetchBacklogs(),
     {
       initialValue: [],
     }
@@ -44,7 +42,7 @@ export default function createBacklogs(
       return mutate(data);
     },
     addBacklog(data: CreateDto) {
-      return addBacklog(data, state.token);
+      return agent.backlogs.addBacklog(data);
     },
     addPendingItem(data: CreatePendingItemDto) {
       mutate((prev) => [
@@ -77,10 +75,10 @@ export default function createBacklogs(
       );
     },
     removeBacklog(id: string) {
-      return removePomodoro<BacklogType>(id, state.token);
+      return agent.tasks.remove<BacklogType>(id);
     },
     changeBacklogsOrder(data: ChangeOrderDto) {
-      return changeOrder<BacklogType>(data, state.token);
+      return agent.tasks.changeOrder<BacklogType>(data);
     },
     moveBacklogItemAndReOrder(id: string) {
       mutate((prev) => {

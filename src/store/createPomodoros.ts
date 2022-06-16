@@ -2,10 +2,9 @@ import { createResource } from "solid-js";
 import type { Resource } from "solid-js";
 import { StoreType } from "../types/store";
 import { BacklogType, PomodoroType } from "../types/pomodoro";
-import { fetchPomodoros, makeTaskDone } from "../api/pomodoros";
-import { changeOrder, changeTaskStatus, removePomodoro } from "../api/shared";
 import { Actions } from "./";
 import { ChangeOrderDto, ChangeTaskStatusDto } from "../types/shared";
+import { Agent } from "./createAgent";
 
 export interface PomodorosActions {
   loadPomodoros(): PomodoroType[] | Promise<PomodoroType[]> | undefined | null;
@@ -25,15 +24,13 @@ export interface PomodorosActions {
   changePomodorosOrder(data: ChangeOrderDto): Promise<PomodoroType[]>;
 }
 
-export default function createPomodoros({
-  actions,
-  state,
-}: {
-  actions: Actions;
-  state: StoreType;
-}): Resource<PomodoroType[]> {
+export default function createPomodoros(
+  actions: Actions,
+  state: StoreType,
+  agent: Agent
+): Resource<PomodoroType[]> {
   const [pomodoros, { mutate, refetch }] = createResource<PomodoroType[]>(
-    async () => await fetchPomodoros(state.token),
+    async () => await agent.pomodoros.fetchPomodoros(),
     {
       initialValue: [],
     }
@@ -41,7 +38,7 @@ export default function createPomodoros({
 
   Object.assign<Actions, PomodorosActions>(actions, {
     changePomodorosOrder(data: ChangeOrderDto) {
-      return changeOrder<PomodoroType>(data, state.token);
+      return agent.tasks.changeOrder<PomodoroType>(data);
     },
     loadPomodoros() {
       return refetch();
@@ -50,7 +47,7 @@ export default function createPomodoros({
       return mutate(data);
     },
     remove(id: string) {
-      return removePomodoro(id, state.token);
+      return agent.tasks.remove<PomodoroType>(id);
     },
     clientRemove(id: string) {
       if (id === state.activePomodoro()?._id) {
@@ -66,7 +63,7 @@ export default function createPomodoros({
       });
     },
     makeTaskDone(id: string) {
-      return makeTaskDone(id, state.token);
+      return agent.pomodoros.doneTask(id);
     },
     clientFilterDoneTask(id: string) {
       mutate((prev) => {
@@ -110,7 +107,7 @@ export default function createPomodoros({
       });
     },
     changeTaskStatus(id: string, data: ChangeTaskStatusDto) {
-      return changeTaskStatus(id, data, state.token);
+      return agent.pomodoros.changeTaskStatus(id, data);
     },
   });
   return pomodoros;

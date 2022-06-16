@@ -5,7 +5,8 @@ export async function createFetchHttpRequest(
   method: HttpRequestMethodType,
   url: string,
   resKey: string,
-  token: string | null
+  token: string | null,
+  onError?: () => void
 ) {
   // FIXME : make this variables type safe
   const headers: any = {};
@@ -17,12 +18,11 @@ export async function createFetchHttpRequest(
     const response = await fetch(API_ROOT + url, opts);
     const json = await response.json();
     return resKey ? json[resKey] : json;
-  } catch (err) {
-    //if (err && err?.response && err?.response.status === 401) {
-    // ....
-    //actions.logout();
-    //}
-    throw err;
+    // FIXME : type any
+  } catch (err: any) {
+    if (err && err?.response && err?.response.status === 401 && onError) {
+      onError();
+    }
   }
 }
 
@@ -31,7 +31,8 @@ export async function createHttpRequest<DataType>(
   url: string,
   data: DataType,
   resKey: string,
-  token: string | null
+  token: string | null,
+  onError?: () => void
 ) {
   // FIXME : make this variables type safe
   const headers: any = {};
@@ -48,11 +49,11 @@ export async function createHttpRequest<DataType>(
     const response = await fetch(API_ROOT + url, opts);
     const json = await response.json();
     return resKey ? json[resKey] : json;
-  } catch (err) {
-    //if (err && err?.response && err?.response.status === 401) {
-    // ....
-    //actions.logout();
-    //}
+    //FIXME
+  } catch (err: any) {
+    if (err && err?.response && err?.response.status === 401 && onError) {
+      onError();
+    }
     throw err;
   }
 }

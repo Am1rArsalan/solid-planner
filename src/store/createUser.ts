@@ -1,9 +1,8 @@
 import { createResource } from "solid-js";
 import type { Resource } from "solid-js";
-import { StoreType } from "../types/store";
 import { UserType } from "../types/user";
-import { fetchUser, logout } from "../api/user";
 import { Actions } from ".";
+import { UserAgent } from "./createAgent";
 
 export interface UserActions {
   logout(): Promise<void>;
@@ -11,16 +10,14 @@ export interface UserActions {
 
 export default function createUser(
   actions: Actions,
-  state: StoreType
+  agent: UserAgent
 ): Resource<UserType | undefined> {
-  const [user, { mutate, refetch }] = createResource<UserType>(
-    async () => await fetchUser(state.token)
-  );
+  const [user] = createResource<UserType>(async () => await agent.fetchUser());
 
   Object.assign<Actions, UserActions>(actions, {
     logout() {
       localStorage.removeItem("token");
-      return logout(state.token);
+      return agent.logout();
     },
   });
 
