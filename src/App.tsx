@@ -1,15 +1,13 @@
 import { Component } from "solid-js";
-import { useNavigate } from "solid-app-router";
 import styles from "./App.module.css";
 import Backlogs from "./components/Backlogs";
 import Pomodoros from "./components/Pomodoros";
-import { Button } from "./components/UI/button";
+import Header from "./components/Header";
 import { classNames } from "./components/UI/utils/classNames";
 import { useStore } from "./store";
 import { BacklogType, PomodoroType, TaskType } from "./types/pomodoro";
 
 const App: Component = () => {
-  const nav = useNavigate();
   const [
     { pomodoroState, pomodoros, backlogs },
     {
@@ -22,6 +20,7 @@ const App: Component = () => {
     },
   ] = useStore();
 
+  // TODO : move this to the store actions
   const handleMove = async (
     id: string,
     currentStatus: "Backlog" | "Pomodoro"
@@ -41,7 +40,6 @@ const App: Component = () => {
       moveBacklogItemAndReOrder(id);
       addMovedBacklogItem(removedItem);
     }
-
     try {
       await changeTaskStatus(id, {
         status: currentStatus,
@@ -62,24 +60,18 @@ const App: Component = () => {
 
   return (
     <div class={styles.App}>
-      <Button
-        class={styles.SignInButton}
-        onClick={async () => {
-          await logout();
-          nav("/auth");
-        }}
-      >
-        logout
-      </Button>
-      <Backlogs move={handleMove} />
-      <Pomodoros move={handleMove} />
-      <div
-        class={
-          pomodoroState() === "Focus"
-            ? styles.Background
-            : classNames(styles.Background, styles.BlueBackground)
-        }
-      />
+      <Header />
+      <div class={styles.Content}>
+        <Backlogs move={handleMove} />
+        <Pomodoros move={handleMove} />
+        <div
+          class={
+            pomodoroState() === "Focus"
+              ? styles.Background
+              : classNames(styles.Background, styles.BlueBackground)
+          }
+        />
+      </div>
     </div>
   );
 };
