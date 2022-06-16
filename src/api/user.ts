@@ -1,7 +1,7 @@
 import { UserType } from "../types/user";
 import { createFetchHttpRequest } from "./createHttpRequest";
 
-export async function fetchUser(token: string | null): Promise<UserType[]> {
+export async function fetchUser(token: string | null): Promise<UserType> {
   const result = await createFetchHttpRequest("GET", "/user", "data", token);
 
   return result;

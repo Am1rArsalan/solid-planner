@@ -31,7 +31,7 @@ export const Provider: Component<ParentProps> = (props) => {
   let pomodoros: Resource<PomodoroType[]>;
   let pomodoroState: Accessor<PomodoroFocusType>;
   let activePomodoro: Accessor<PomodoroType | null>;
-  let user: Resource<UserType | null>;
+  let user: Resource<UserType | undefined>;
 
   const [state] = createStore<StoreType>({
     token: localStorage.getItem("token"),

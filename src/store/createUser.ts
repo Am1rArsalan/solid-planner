@@ -12,9 +12,8 @@ export interface UserActions {
 export default function createUser(
   actions: Actions,
   state: StoreType
-): Resource<UserType> {
+): Resource<UserType | undefined> {
   const [user, { mutate, refetch }] = createResource<UserType>(
-    // fetch user
     async () => await fetchUser(state.token)
   );
 
