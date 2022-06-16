@@ -6,24 +6,28 @@ export async function createFetchHttpRequest(
   url: string,
   resKey: string,
   token: string | null,
-  onError?: () => void
+  onError: () => void
 ) {
   // FIXME : make this variables type safe
+  if (!token) return;
+
   const headers: any = {};
   const opts: any = { method, headers };
 
-  if (token) headers["Authorization"] = `${token}`;
+  headers["Authorization"] = `${token}`;
 
-  try {
-    const response = await fetch(API_ROOT + url, opts);
-    const json = await response.json();
-    return resKey ? json[resKey] : json;
-    // FIXME : type any
-  } catch (err: any) {
-    if (err && err?.response && err?.response.status === 401 && onError) {
-      onError();
-    }
+  const res = await fetch(API_ROOT + url, opts);
+  if (!res.ok && res.status == 401) {
+    onError();
+    return;
   }
+
+  if (!res.ok) {
+    return;
+  }
+
+  const json = await res.json();
+  return resKey ? json[resKey] : json;
 }
 
 export async function createHttpRequest<DataType>(
@@ -32,28 +36,31 @@ export async function createHttpRequest<DataType>(
   data: DataType,
   resKey: string,
   token: string | null,
-  onError?: () => void
+  onError: () => void
 ) {
   // FIXME : make this variables type safe
+  if (!token) return;
+
   const headers: any = {};
   const opts: any = { method, headers };
 
   if (data !== undefined) {
-    headers["Content-Type"] = "application/json";
     opts.body = JSON.stringify(data);
+    headers["Content-Type"] = "application/json";
   }
 
-  if (token) headers["Authorization"] = `${token}`;
+  headers["Authorization"] = `${token}`;
 
-  try {
-    const response = await fetch(API_ROOT + url, opts);
-    const json = await response.json();
-    return resKey ? json[resKey] : json;
-    //FIXME
-  } catch (err: any) {
-    if (err && err?.response && err?.response.status === 401 && onError) {
-      onError();
-    }
-    throw err;
+  const res = await fetch(API_ROOT + url, opts);
+  if (!res.ok && res.status == 401 && onError) {
+    onError();
+    return;
   }
+
+  if (!res.ok) {
+    return;
+  }
+
+  const json = await res.json();
+  return resKey ? json[resKey] : json;
 }
