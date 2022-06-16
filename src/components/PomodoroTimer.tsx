@@ -42,6 +42,7 @@ const PomodoroTimer: Component<ParentProps> = (props) => {
 
   const resetTimerState = () => {
     setState({
+      ...state,
       timerState: "PAUSE",
       time: {
         minutes: timeMap.get(pomodoroState()) as number,
@@ -113,7 +114,7 @@ const PomodoroTimer: Component<ParentProps> = (props) => {
             clone.time.minutes = clone.time.minutes - 1;
           }
         }
-        setState({ ...clone });
+        setState({ ...state, ...clone });
       }
     }, 5);
   });
