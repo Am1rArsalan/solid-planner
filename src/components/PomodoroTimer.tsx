@@ -8,11 +8,7 @@ import {
 import { createStore } from "solid-js/store";
 import { timeMap } from "../constants/pomodoro";
 import { useStore } from "../store";
-import {
-  PomodoroFocusType,
-  PomodoroTimerState,
-  PomodoroType,
-} from "../types/pomodoro";
+import { PomodoroFocusType, PomodoroTimerState } from "../types/pomodoro";
 import styles from "./styles/PomodoroTimer.module.css";
 import { Button } from "./UI/button";
 
@@ -85,15 +81,11 @@ const PomodoroTimer: Component<ParentProps> = (props) => {
     changePomodoroStatus(value);
     if (activePomodoro()) {
       cycleFocus();
-      try {
-        // FIXME : ...
-        const data = activePomodoro() as PomodoroType;
-        await editPomodoro(data._id, data.end, data.current + 1, data.title);
+      const data = activePomodoro();
+      data &&
+        (await editPomodoro(data._id, data.end, data.current + 1, data.title));
 
-        loadPomodoros();
-      } catch (error) {
-        /// FIXME : set error///
-      }
+      loadPomodoros();
     }
   };
 
@@ -123,7 +115,7 @@ const PomodoroTimer: Component<ParentProps> = (props) => {
         }
         setState({ ...clone });
       }
-    }, 10);
+    }, 5);
   });
 
   onCleanup(() => clearInterval(interval));
