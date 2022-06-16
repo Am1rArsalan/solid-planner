@@ -16,7 +16,8 @@ export default function createUser(
 
   Object.assign<Actions, UserActions>(actions, {
     logout() {
-      localStorage.removeItem("token");
+      window.location.replace("/auth");
+      localStorage.clear();
       return agent.logout();
     },
   });
