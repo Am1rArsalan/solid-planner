@@ -90,7 +90,7 @@ const PomodoroTimer: Component<ParentProps> = (props) => {
     }
   };
 
-  let interval: number;
+  let interval: ReturnType<typeof setInterval>;
 
   createEffect(() => {
     interval = setInterval(() => {

@@ -1,8 +1,5 @@
 import { StoreContextType } from ".";
-import {
-  createFetchHttpRequest,
-  createHttpRequest,
-} from "../api/createHttpRequest";
+import { createFetchHttpRequest, createHttpRequest } from "./createHttpRequest";
 import {
   BacklogType,
   CreateDto,
