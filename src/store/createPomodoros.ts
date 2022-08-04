@@ -50,7 +50,7 @@ export default function createPomodoros(
       return agent.tasks.remove<PomodoroType>(id);
     },
     clientRemove(id: string) {
-      if (id === state.activePomodoro()?._id) {
+      if (id === state.activePomodoro?._id) {
         actions.changeActivePomodoro(null);
       }
       mutate((prev) => {

@@ -9,9 +9,9 @@ import Auth from "./screens/Auth";
 
 const AppWithAuth = () => {
   const nav = useNavigate();
-  const [{ token }] = useStore();
+  const [store] = useStore();
 
-  if (!token?.length) {
+  if (!store.token?.length) {
     nav("/auth");
   }
 

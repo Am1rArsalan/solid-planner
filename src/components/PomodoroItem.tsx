@@ -7,7 +7,7 @@ import { classNames } from "./UI/utils/classNames";
 type Props = ParentProps<
   PomodoroType & {
     handleActive: () => void;
-    activePomodoro: Accessor<PomodoroType | null>;
+    activePomodoro: PomodoroType | null;
   }
 >;
 
@@ -37,7 +37,7 @@ export const SortablePomodoroItem: Component<Props> = (props) => {
   return (
     <div
       use:sortable
-      aria-label={`${activePomodoro()?._id === _id}`}
+      aria-label={`${activePomodoro?._id === _id}`}
       class={
         !done
           ? classNames(styles.PomodoroItem, "sortable")

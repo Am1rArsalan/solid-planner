@@ -14,7 +14,7 @@ import { Button } from "./UI/button";
 
 const PomodoroTimer: Component<ParentProps> = (props) => {
   const [
-    { pomodoroState, activePomodoro },
+    store,
     { editPomodoro, changePomodoroStatus, cycleFocus, loadPomodoros },
   ] = useStore();
 
@@ -45,14 +45,14 @@ const PomodoroTimer: Component<ParentProps> = (props) => {
       ...state,
       timerState: "PAUSE",
       time: {
-        minutes: timeMap.get(pomodoroState()) as number,
+        minutes: timeMap.get(store.pomodoroState) as number,
         seconds: 0,
       },
     });
   };
 
   const handleRun = () => {
-    if (activePomodoro()) {
+    if (store.activePomodoro) {
       setState({
         ...state,
         timerState: state.timerState === "PLAY" ? "PAUSE" : "PLAY",
@@ -80,9 +80,9 @@ const PomodoroTimer: Component<ParentProps> = (props) => {
       return;
     }
     changePomodoroStatus(value);
-    if (activePomodoro()) {
+    if (store.activePomodoro) {
       cycleFocus();
-      const data = activePomodoro();
+      const data = store.activePomodoro;
       data &&
         (await editPomodoro(data._id, data.end, data.current + 1, data.title));
 
@@ -102,9 +102,9 @@ const PomodoroTimer: Component<ParentProps> = (props) => {
           clone.time.seconds = clone.time.minutes - 1 >= 0 ? 59 : 0;
           if (clone.time.minutes - 1 < 0) {
             handleChangePomodoroStatus(
-              pomodoroState() == "Focus" ? "Rest" : "Focus"
+              store.pomodoroState == "Focus" ? "Rest" : "Focus"
             );
-            clone.time.minutes = timeMap.get(pomodoroState()) as number;
+            clone.time.minutes = timeMap.get(store.pomodoroState) as number;
             clone.timerState = "PAUSE";
             const audio = new Audio(
               "https://media.geeksforgeeks.org/wp-content/uploads/20190531135120/beep.mp3"
@@ -126,10 +126,10 @@ const PomodoroTimer: Component<ParentProps> = (props) => {
       <div class={styles.PomodoroFocusManagementWrapper}>
         <div class={styles.SelectPomodoroFocusTypeButtonsWrapper}>
           <Button
-            aria-label={`${pomodoroState() === "Focus"}`}
+            aria-label={`${store.pomodoroState === "Focus"}`}
             class={styles.SelectPomodoroFocusTypeButton}
             onClick={() => {
-              if (pomodoroState() !== "Focus") {
+              if (store.pomodoroState !== "Focus") {
                 changePomodoroStatus("Focus");
                 resetTimerState();
               }
@@ -138,10 +138,10 @@ const PomodoroTimer: Component<ParentProps> = (props) => {
             Pomodoro
           </Button>
           <Button
-            aria-label={`${pomodoroState() === "Rest"}`}
+            aria-label={`${store.pomodoroState === "Rest"}`}
             class={styles.SelectPomodoroFocusTypeButton}
             onClick={() => {
-              if (pomodoroState() !== "Rest") {
+              if (store.pomodoroState !== "Rest") {
                 changePomodoroStatus("Rest");
                 resetTimerState();
               }

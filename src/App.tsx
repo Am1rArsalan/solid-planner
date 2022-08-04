@@ -7,7 +7,7 @@ import { classNames } from "./components/UI/utils/classNames";
 import { useStore } from "./store";
 
 const App: Component = () => {
-  const [{ pomodoroState }, { handleMove }] = useStore();
+  const [store, { handleMove }] = useStore();
 
   return (
     <div class={styles.App}>
@@ -17,7 +17,7 @@ const App: Component = () => {
         <Pomodoros move={handleMove} />
         <div
           class={
-            pomodoroState() === "Focus"
+            store.pomodoroState === "Focus"
               ? styles.Background
               : classNames(styles.Background, styles.BlueBackground)
           }

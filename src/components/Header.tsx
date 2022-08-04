@@ -5,7 +5,7 @@ import { Button } from "./UI/button";
 import { useNavigate } from "solid-app-router";
 
 const Header: Component = () => {
-  const [{ user }, { logout }] = useStore();
+  const [store, { logout }] = useStore();
   const nav = useNavigate();
 
   return (
@@ -19,8 +19,7 @@ const Header: Component = () => {
       >
         logout
       </Button>
-
-      {user()?.displayName}
+      {store.user?.displayName}
     </header>
   );
 };

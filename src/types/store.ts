@@ -1,12 +1,11 @@
-import { Accessor, Resource } from "solid-js";
 import { BacklogType, PomodoroFocusType, PomodoroType } from "./pomodoro";
 import { UserType } from "./user";
 
 export type StoreType = {
   readonly token: string | null;
-  readonly backlogs: Resource<BacklogType[]>;
-  readonly pomodoros: Resource<PomodoroType[]>;
-  readonly pomodoroState: Accessor<PomodoroFocusType>;
-  readonly activePomodoro: Accessor<PomodoroType | null>;
-  readonly user: Resource<UserType | undefined>;
+  readonly backlogs: BacklogType[];
+  readonly pomodoros: PomodoroType[];
+  readonly pomodoroState: PomodoroFocusType;
+  readonly activePomodoro: PomodoroType | null;
+  readonly user: UserType | null;
 };

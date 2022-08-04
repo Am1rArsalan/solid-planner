@@ -21,32 +21,32 @@ type Props = {
 
 const Backlogs: Component<Props> = (props) => {
   const { move } = props;
-  const [{ backlogs }, { mutateBacklogs, removeBacklog, changeBacklogsOrder }] =
+  const [store, { mutateBacklogs, removeBacklog, changeBacklogsOrder }] =
     useStore();
   const [activeItem, setActiveItem] = createSignal(null);
-  const backlogIds = () => backlogs().map((item) => item._id);
+  const backlogIds = () => store.backlogs.map((item) => item._id);
 
   const handleRemoveBacklog = async (id: string) => {
     if (id.length === 0) return;
     // FIXME: redo this types
-    let removedItemIndex = backlogs().findIndex(
+    let removedItemIndex = store.backlogs.findIndex(
       (item) => item._id == id
     ) as number;
     if (removedItemIndex == -1) return;
 
-    let removedItem = backlogs()[removedItemIndex];
+    let removedItem = store.backlogs[removedItemIndex];
 
-    mutateBacklogs(backlogs().filter((item) => item._id !== id));
+    mutateBacklogs(store.backlogs.filter((item) => item._id !== id));
     try {
       await removeBacklog(id);
     } catch (error) {
-      mutateBacklogs([...backlogs(), removedItem]);
+      mutateBacklogs([...store.backlogs, removedItem]);
     }
   };
 
   const onDragEnd = async ({ draggable, droppable }) => {
     if (draggable && droppable) {
-      const currentItems = backlogs();
+      const currentItems = store.backlogs;
       const fromIndex = currentItems.findIndex(
         (item) => `${item._id}-${item.order}` === draggable.id
       );
@@ -90,15 +90,15 @@ const Backlogs: Component<Props> = (props) => {
     >
       <BacklogsContainer>
         <div style={{ height: "3rem", width: "100%", padding: "1rem" }}>
-          {backlogs.loading && "loading..."}
+          {!store.backlogs && "loading..."}
         </div>
         <DragDropSensors />
         <SortableProvider ids={backlogIds()}>
-          <For each={backlogs()}>
+          <For each={store.backlogs}>
             {(task) => (
               <SortableBacklogItem
                 backlog={task}
-                draggableId={`backlogs()-dnd-${task._id}`}
+                draggableId={`store.backlogs-dnd-${task._id}`}
               >
                 <IconButton
                   disabled={task._id === "Pending"}

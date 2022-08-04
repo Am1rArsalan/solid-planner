@@ -5,7 +5,7 @@ import { useStore } from "../store";
 import styles from "../App.module.css";
 
 const Auth: Component = () => {
-  const [{ pomodoroState }, _] = useStore();
+  const [store, _] = useStore();
 
   return (
     <div class={styles.Auth}>
@@ -14,7 +14,7 @@ const Auth: Component = () => {
       </a>
       <div
         class={
-          pomodoroState() === "Focus"
+          store.pomodoroState === "Focus"
             ? styles.Background
             : classNames(styles.Background, styles.BlueBackground)
         }

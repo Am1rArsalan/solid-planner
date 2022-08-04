@@ -42,19 +42,20 @@ export const Provider: Component<ParentProps> = (props) => {
   const [state] = createStore<StoreType>({
     token: localStorage.getItem("token"),
     get backlogs() {
-      return backlogs;
+      return backlogs();
     },
     get pomodoros() {
-      return pomodoros;
+      return pomodoros();
     },
     get pomodoroState() {
-      return pomodoroState;
+      return pomodoroState();
     },
     get activePomodoro() {
-      return activePomodoro;
+      return activePomodoro();
     },
     get user() {
-      return user;
+      const userData = user();
+      return userData ? userData : null;
     },
   });
 

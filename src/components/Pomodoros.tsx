@@ -33,7 +33,7 @@ const Pomodoros: Component<Props> = ({ move }) => {
   const [showEdit, setShowForm] = createSignal("");
   const [activeDrag, setActiveDrag] = createSignal(null);
   const [
-    { pomodoros, activePomodoro },
+    store,
     {
       remove,
       clientRemoveRevalidate,
@@ -46,14 +46,14 @@ const Pomodoros: Component<Props> = ({ move }) => {
     },
   ] = useStore();
 
-  const pomodoroIds = () => pomodoros().map((item) => item._id);
+  const pomodoroIds = () => store.pomodoros.map((item) => item._id);
 
   const handleRemovePomodoro = async (id: string) => {
     if (id.length === 0) return;
-    let removedItemIndex = pomodoros().findIndex(
+    let removedItemIndex = store.pomodoros.findIndex(
       (item) => item._id == id
     ) as number;
-    let removedItem = pomodoros()[removedItemIndex] as PomodoroType;
+    let removedItem = store.pomodoros[removedItemIndex] as PomodoroType;
 
     clientRemove(id);
 
@@ -63,7 +63,7 @@ const Pomodoros: Component<Props> = ({ move }) => {
       clientRemoveRevalidate(removedItem);
     }
 
-    if (activePomodoro()?._id == id) {
+    if (store.activePomodoro?._id == id) {
       changeActivePomodoro(null);
     }
   };
@@ -71,7 +71,7 @@ const Pomodoros: Component<Props> = ({ move }) => {
   // FIX : ts error ( dnd )
   const onDragEnd = async ({ draggable, droppable }) => {
     if (draggable && droppable) {
-      const currentItems = pomodoros();
+      const currentItems = store.pomodoros;
       const fromIndex = currentItems.findIndex(
         (item) => `${item._id}-${item.order}` === draggable.id
       );
@@ -107,8 +107,8 @@ const Pomodoros: Component<Props> = ({ move }) => {
   };
 
   const handleActive = async (id: string) => {
-    if (id === activePomodoro()?._id) return;
-    const activeItem = pomodoros().find((item) => item._id == id);
+    if (id === store.activePomodoro?._id) return;
+    const activeItem = store.pomodoros.find((item) => item._id == id);
     changeActivePomodoro(activeItem ? activeItem : null);
   };
 
@@ -125,7 +125,7 @@ const Pomodoros: Component<Props> = ({ move }) => {
   return (
     <PomodoroTimer>
       <div style={{ height: "3rem", width: "100%", padding: "1rem" }}>
-        {pomodoros.loading && "loading..."}
+        {!store.pomodoros && "loading..."}
       </div>
       <DragDropProvider
         onDragStart={({ draggable }) => {
@@ -136,7 +136,7 @@ const Pomodoros: Component<Props> = ({ move }) => {
       >
         <DragDropSensors />
         <SortableProvider ids={pomodoroIds() || []}>
-          <For each={pomodoros()}>
+          <For each={store.pomodoros}>
             {(item) => (
               <>
                 <Show
@@ -154,12 +154,12 @@ const Pomodoros: Component<Props> = ({ move }) => {
                   }
                 >
                   <SortablePomodoroItem
-                    activePomodoro={activePomodoro}
+                    activePomodoro={store.activePomodoro}
                     handleActive={() => handleActive(item._id)}
                     {...item}
                   >
                     <IconButton
-                      disabled={activePomodoro()?._id == item._id}
+                      disabled={store.activePomodoro?._id == item._id}
                       onClick={(e) => {
                         e.stopPropagation();
                         move(item._id, "Pomodoro");
@@ -208,7 +208,7 @@ const Pomodoros: Component<Props> = ({ move }) => {
             activePomodoro={activeDrag}
             draggableId={"pomodoros-dnd"}
           >
-            heyyyy
+            hey
           </PomodoroItem>
         </DragOverlay>
       </DragDropProvider>

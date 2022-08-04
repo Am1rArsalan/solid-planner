@@ -10,7 +10,7 @@ const BacklogForm: Component<{ handleClose: () => void }> = ({
   handleClose,
 }) => {
   const [
-    { backlogs },
+    store,
     { addBacklog, addPendingItem, revalidateAddedItem, removePendingItem },
   ] = useStore();
   const [state, setState] = createStore<{
@@ -39,7 +39,7 @@ const BacklogForm: Component<{ handleClose: () => void }> = ({
     try {
       const addedBacklog = await addBacklog({
         title: state.value,
-        order: backlogs().length,
+        order: store.backlogs.length,
         end: state.est,
       });
       revalidateAddedItem(addedBacklog, creationTime);
