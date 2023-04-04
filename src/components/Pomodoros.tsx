@@ -24,12 +24,13 @@ import { ArrowDown } from "./UI/icons/ArrowDown";
 import { ArrowLeft } from "./UI/icons/ArrowLeft";
 import { ArrowUp } from "./UI/icons/ArrowUp";
 import { Check } from "./UI/icons/Check";
+import SlideIn from "./UI/slide-in/SlideIn";
 
 type Props = {
   move: (id: string, currentStatus: "Backlog" | "Pomodoro") => void;
 };
 
-const Pomodoros: Component<Props> = ({ move }) => {
+function Pomodoros({ move }: Props) {
   const [showEdit, setShowForm] = createSignal("");
   const [activeDrag, setActiveDrag] = createSignal(null);
   const [
@@ -50,10 +51,10 @@ const Pomodoros: Component<Props> = ({ move }) => {
 
   const handleRemovePomodoro = async (id: string) => {
     if (id.length === 0) return;
-    let removedItemIndex = store.pomodoros.findIndex(
+    const removedItemIndex = store.pomodoros.findIndex(
       (item) => item._id == id
     ) as number;
-    let removedItem = store.pomodoros[removedItemIndex] as PomodoroType;
+    const removedItem = store.pomodoros[removedItemIndex] as PomodoroType;
 
     clientRemove(id);
 
@@ -87,7 +88,7 @@ const Pomodoros: Component<Props> = ({ move }) => {
       }
 
       if (fromIndex !== toIndex) {
-        let updatedItems = currentItems.slice();
+        const updatedItems = currentItems.slice();
         updatedItems.splice(toIndex, 0, ...updatedItems.splice(fromIndex, 1));
         mutatePomodoros(updatedItems);
         try {
@@ -142,7 +143,7 @@ const Pomodoros: Component<Props> = ({ move }) => {
                 <Show
                   when={showEdit() !== item._id}
                   fallback={
-                    <SlideIn showEdit={showEdit} id={item._id}>
+                    <SlideIn showEdit={showEdit() !== item._id}>
                       <PomodoroEditForm
                         current={item.current}
                         end={item.end}
@@ -214,26 +215,6 @@ const Pomodoros: Component<Props> = ({ move }) => {
       </DragDropProvider>
     </PomodoroTimer>
   );
-};
-
-type SlideInProps = ParentProps<{ showEdit: Accessor<string>; id: string }>;
-
-// FIX: slide in does not work
-const SlideIn: Component<SlideInProps> = ({ children, showEdit, id }) => {
-  return (
-    <div
-      style={{
-        width: showEdit() !== id ? 0 : "100%",
-        "max-height": showEdit() !== id ? 0 : "30rem",
-        display: "flex",
-        "justify-content": "space-between",
-        "flex-direction": "column",
-        transition: "all  40ms ease-out",
-      }}
-    >
-      {children}
-    </div>
-  );
-};
+}
 
 export default Pomodoros;
