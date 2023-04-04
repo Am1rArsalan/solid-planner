@@ -1,0 +1,6 @@
+.slideIn {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  transition: all 40ms ease-out;
+}
