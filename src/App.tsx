@@ -9,7 +9,7 @@ function App() {
   const [store, { handleMove }] = useStore();
 
   return (
-    <div class={styles.App}>
+    <div>
       <Header />
       <div class={styles.Content}>
         <Backlogs move={handleMove} />

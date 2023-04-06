@@ -1,11 +1,8 @@
-### pomodoro planner application 
+### pomodoro planner application
 
-features : 
-   - [x] backlog 
-   - [x] pomodoro task management 
-   - [] calender 
-   - [] improve ui 
+features :
 
-
-
-
+- [x] backlog
+- [x] pomodoro task management
+- [] calender
+- [] improve ui
